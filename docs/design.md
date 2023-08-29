@@ -78,19 +78,20 @@ Prereqs
     - Deploy app of apps
 * Create infrastructure for dev/prod
     - Blueprint (use ootb) with ArgoCD and Kubevela, as well as Nginx, external DNS and external secrets
-    - Add teams and secrets, create databases and queues
+    - Add teams and secrets, create databases and queues and service accounts
     - Bootstrap argo to point to the app of apps
-
+    - Deploy dev
+    - Replicate dev to prod with pipeline
+    - Replace dev with new dev with apps in flight
 * Promotions
     - Create dev apps of apps and prod app of apps
-
+    - Introduce a change to the app and execute a no-op CICD process
+    - Observe promotion
 * CICD
     - Create CodeBuild with static code analysis and basic test
     - Create performance test
-
 * Introduce a change to the application - PR
     - Show static code analysis and performance test running
     - show automatic promotion from dev to prod
-
 * Progressive delivery example on one of the apps with Flagger
 
