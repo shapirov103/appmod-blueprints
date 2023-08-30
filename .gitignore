@@ -132,4 +132,4 @@ dist
 # other files
 platform/infra/cdk.context.json
 platform/infra/package-lock.json
-platform/.cdk.out
+platform/infra/cdk.out
