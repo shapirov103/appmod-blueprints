@@ -128,3 +128,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# other files
+platform/infra/cdk.context.json
+platform/infra/package-lock.json
+platform/.cdk.out
