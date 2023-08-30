@@ -129,7 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# other files
+# other files CDK related
 platform/infra/cdk.context.json
 platform/infra/package-lock.json
 platform/infra/cdk.out
