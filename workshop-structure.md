@@ -1,15 +1,3 @@
-## Env Setup
-
-![Env Setup](images/env-setup.png)
-
-## GitOps Pipeline
-
-![GitOps Pipeline](images/gitops-pipeline.png)
-
-## GitOps Pipeline
-
-![CD Orchestration](images/orchestration.png)
-
 ## Workshop Structure
 
 1. Setup existing environment
@@ -27,3 +15,16 @@
 4.2 Deploy the apps with vela up
 5. Configure KubeVela workflow to demonstrate deployment orchestration
 6. Configure KubeVela UX and enable Observability (Grafana, Prometheus)
+
+
+## Env Setup
+
+![Env Setup](images/env-setup.png)
+
+## GitOps Pipeline
+
+![GitOps Pipeline](images/gitops-pipeline.png)
+
+## GitOps Pipeline
+
+![CD Orchestration](images/orchestration.png)
