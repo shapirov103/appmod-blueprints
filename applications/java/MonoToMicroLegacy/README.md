@@ -1,0 +1,1 @@
+This content moved to: **https://app-modernization.workshop.aws/en/monolith-app.html** 
