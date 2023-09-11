@@ -20,7 +20,7 @@ export default class HybridCluster {
                     bootstrapRepo: {
                         repoUrl: GIT_URL,
                         targetRevision: "feature/argo-cd",
-                        path: 'deployment/env/dev',
+                        path: 'deployment/envs/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
                     }
