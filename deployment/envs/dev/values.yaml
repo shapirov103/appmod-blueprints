@@ -1,2 +1,3 @@
-labels:
-  team: data 
+spec:
+  destination:
+    server: https://kubernetes.default.svc
