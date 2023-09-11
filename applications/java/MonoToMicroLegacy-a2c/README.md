@@ -3,7 +3,7 @@
 
 ## High level Steps
 
-1. Deploy AWs CloudFormation template app2containersetup.yaml in us-west-2 region
+1. Deploy AWS CloudFormation template app2containersetup.yaml in us-west-2 region
 
 2. Assuming EKS cluster is already created and provisioned
 
