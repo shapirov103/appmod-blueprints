@@ -11,6 +11,6 @@ spec:
     server: {{ .Values.spec.destination.server }}
   project: default
   source:
-    path: platform/gitops/addons/mongo
+    path: deployment/addons/mongo
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}

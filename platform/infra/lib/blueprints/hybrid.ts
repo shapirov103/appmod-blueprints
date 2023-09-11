@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { KubevelaAddon } from '../addons/kubevela';
+import { tagAsg } from '@aws-quickstart/eks-blueprints/dist/utils';
 
 const GIT_URL = "git@github.com:shapirov103/appmod-blueprints.git";
 
@@ -18,7 +19,8 @@ export default class HybridCluster {
                 new blueprints.ArgoCDAddOn({
                     bootstrapRepo: {
                         repoUrl: GIT_URL,
-                        path: 'platform/gitops/addons/mongo',
+                        targetRevision: "feature/argo-cd",
+                        path: 'deployment/env/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
                     }
