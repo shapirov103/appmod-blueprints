@@ -1,5 +1,5 @@
 # appmod-blueprints
-#This is the sample Java application which is running on Ec2
+This is the sample Java application which is running on EC2
 
 ## High level Steps
 
