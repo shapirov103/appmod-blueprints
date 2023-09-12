@@ -9,7 +9,7 @@ This is the sample Java application which is running on EKS
 
 3. Create the namespace on Kubernetes 
 
-`kubectl creat ns appmod-java`
+`kubectl create ns appmod-java`
 
 
 4. Rebuild the image using command
