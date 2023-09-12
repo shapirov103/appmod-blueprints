@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-appmod-deployment
+  labels:
+    app: java-appmod
+    release: initial
+    shortImageDigest: 4112de9e273d9f67d29bdb67
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-appmod
+      release: initial
+  template:
+    metadata:
+      labels:
+        app: java-appmod
+        release: initial
+    spec:
+      containers:
+      - name: java-appmod
+        image: public.ecr.aws/i8e1q7x5/appmod-demo:latest 
+        ports:
+        - containerPort: 8080
+        - containerPort: 8005
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: 1028Mi
+          limits:
+            cpu: "0.5"
+            memory: 1028Mi
