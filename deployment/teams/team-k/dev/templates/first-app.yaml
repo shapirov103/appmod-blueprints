@@ -13,8 +13,8 @@ spec:
             value: "KubeVela"
         port: 8080
       traits:
-        - type: ingress-1-20
+        - type: appingress
           properties:
-            domain: localhost 
+            domain: "*.amazonaws.com" 
             http:
               /: 8080
