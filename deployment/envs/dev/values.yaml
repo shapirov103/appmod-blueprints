@@ -1,0 +1,6 @@
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: git@github.com:shapirov103/appmod-blueprints.git
+    targetRevision: feature/argo-cd
