@@ -14,7 +14,7 @@ export default class HybridCluster {
                 new blueprints.VpcCniAddOn, 
                 new blueprints.MetricsServerAddOn,
                 new blueprints.ClusterAutoScalerAddOn,
-                new KubevelaAddon(),
+                //new KubevelaAddon(),
                 new blueprints.SecretsStoreAddOn(),
                 new blueprints.ArgoCDAddOn({
                     bootstrapRepo: {
@@ -23,7 +23,8 @@ export default class HybridCluster {
                         path: 'deployment/envs/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
-                    }
+                    },
+                    adminPasswordSecretName: 'argocd-admin-secret',
                 })
             )
             .build(scope, "hybrid-cluster");

@@ -11,7 +11,7 @@ const defaultProps: HelmChartConfiguration & KubevelaAddOnProps = {
     name: "kubevela",
     namespace: "vela-system",
     chart: "vela-core",
-    release: "vela-core",
+    release: "kubevela",
     repository: "https://kubevela.github.io/charts",
     version: "1.9.6",
     skipVersionValidation: false
