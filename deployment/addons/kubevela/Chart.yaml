@@ -17,4 +17,4 @@ appVersion: "1.0"
 dependencies:
 - name: kubevela 
   version: 1.9.6
-  repository: https://github.com/kubevela/charts 
+  repository: kubevela.github.io/charts/ 
