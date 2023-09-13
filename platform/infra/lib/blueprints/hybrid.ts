@@ -14,12 +14,11 @@ export default class HybridCluster {
                 new blueprints.VpcCniAddOn, 
                 new blueprints.MetricsServerAddOn,
                 new blueprints.ClusterAutoScalerAddOn,
-                new KubevelaAddon(),
                 new blueprints.SecretsStoreAddOn(),
                 new blueprints.ArgoCDAddOn({
                     bootstrapRepo: {
                         repoUrl: GIT_URL,
-                        targetRevision: "feature/argo-cd",
+                        targetRevision: "yogeshArgoCD",
                         path: 'deployment/env/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'

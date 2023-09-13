@@ -2,7 +2,8 @@
   "dependencies": {
     "@aws-quickstart/eks-blueprints": "^1.11.3",
     "aws-cdk": "^2.91.0",
-    "aws-cdk-lib": "^2.94.0"
+    "aws-cdk-lib": "^2.94.0",
+    "cdk": "^2.95.1"
   },
   "devDependencies": {
     "typescript": "^5.2.2"
