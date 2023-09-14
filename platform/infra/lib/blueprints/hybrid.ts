@@ -17,15 +17,15 @@ export default class HybridCluster {
                 //new KubevelaAddon(),
                 new blueprints.SecretsStoreAddOn(),
                 new blueprints.ArgoCDAddOn({
-                    bootstrapRepo: {
-                        repoUrl: GIT_URL,
+                   bootstrapRepo: {
+                     repoUrl: GIT_URL,
                         targetRevision: "feature/yogeshArgoCD",
                         path: 'deployment/envs/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
                     },
-                    //adminPasswordSecretName: 'argocd-admin-secret',
-                })
+                    adminPasswordSecretName: 'argocd-admin-secret',
+               })
             )
             .build(scope, "hybrid-cluster");
     }
