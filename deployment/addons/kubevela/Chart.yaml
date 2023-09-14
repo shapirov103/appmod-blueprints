@@ -18,4 +18,3 @@ dependencies:
 - name: vela-core 
   version: 1.9.6
   repository: https://kubevela.github.io/charts
-  valueFiles: kubevela-values.yaml 
