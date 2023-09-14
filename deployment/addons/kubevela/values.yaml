@@ -153,11 +153,11 @@ featureGates:
 ## @param multicluster.clusterGateway.secureTLS.certPath Path to the certificate file
 ## @param multicluster.clusterGateway.secureTLS.certManager.enabled Whether to enable cert-manager
 multicluster:
-  enabled: false 
+  enabled: true
   metrics:
     enabled: false
   clusterGateway:
-    direct: false 
+    direct: true
     replicaCount: 1
     port: 9443
     image:
@@ -172,7 +172,7 @@ multicluster:
         cpu: 500m
         memory: 200Mi
     secureTLS:
-      enabled: false 
+      enabled: true
       certManager:
         enabled: false
       certPath: /etc/k8s-cluster-gateway-certs
@@ -251,7 +251,7 @@ logFileMaxSize: 1024
 
 ## @skip admissionWebhooks
 admissionWebhooks:
-  enabled: false 
+  enabled: true
   failurePolicy: Fail
   certificate:
     mountPath: /etc/k8s-webhook-certs
