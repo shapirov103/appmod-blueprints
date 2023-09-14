@@ -24,7 +24,7 @@ export default class HybridCluster {
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
                     },
-                    adminPasswordSecretName: 'argocd-admin-secret',
+                    //adminPasswordSecretName: 'argocd-admin-secret',
                 })
             )
             .build(scope, "hybrid-cluster");
