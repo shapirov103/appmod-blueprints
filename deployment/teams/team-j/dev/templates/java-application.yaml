@@ -14,4 +14,4 @@ spec:
           properties:
             domain: "*.amazonaws.com" 
             http:
-              /: 8080
+              /app: 8080
