@@ -39,7 +39,7 @@ For more information on installing the authentication helper tool and authentica
 After the tool is installed you can clone the repo identified under `repositoryCloneUrlHttp`.
 
 ```
-git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/appmod-workshop
+git clone codecommit://appmod-workshop
 ```
 
 ## ArgoCD Support for CodeCommit
