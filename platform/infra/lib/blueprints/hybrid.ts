@@ -19,7 +19,7 @@ export default class HybridCluster {
                 new blueprints.ArgoCDAddOn({
                    bootstrapRepo: {
                      repoUrl: GIT_URL,
-                        targetRevision: "feature/yogeshjavatest",
+                        targetRevision: "main",
                         path: 'deployment/envs/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
