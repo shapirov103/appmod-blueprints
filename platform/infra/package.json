@@ -4,6 +4,13 @@
     "aws-cdk": "2.91.0",
     "aws-cdk-lib": "2.91.0"
   },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "watch": "tsc -w",
+    "test": "jest --verbose false --detectOpenHandles",
+    "cdk": "cdk",
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
+  },
   "devDependencies": {
     "typescript": "^5.2.2"
   }
