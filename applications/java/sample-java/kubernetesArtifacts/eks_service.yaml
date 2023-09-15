@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-appmod-service
+  namespace: appmod-java 
+spec:
+  type: LoadBalancer #Use ClusterIP (the default) so that the service is only accessible within the cluster.
+  selector:
+    app: java-appmod
+    release: initial
+  ports:
+    - name: port-8080
+      port: 8080 # external port must match ingress
+      protocol: TCP
+      targetPort: 8080 # internal port
+    - name: port-8005
+      port: 8005 # external port must match ingress
+      protocol: TCP
+      targetPort: 8005 # internal port

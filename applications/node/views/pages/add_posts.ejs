@@ -1,0 +1,28 @@
+<%- include('../partials/header'); -%>
+
+<h1>Submit a BlogPost</h1>
+
+<br>
+
+<h3 id="status"></h3>
+
+<form action="/api/posts/add_posts" method="post">
+    <div class="mb-3">
+        <label for="inputEmail" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="inputEmail" name="email" placeholder="jeff@amazon.com">
+    </div>
+    <div class="mb-3">
+        <label for="inputTitle" class="form-label">Title</label>
+        <input type="text" class="form-control" id="inputTitle" name="title" placeholder="This Workshop is FUN !!">
+    </div>
+    <div class="mb-3">
+        <label for="inputContent" class="form-label">Content</label>
+        <textarea class="form-control" id="inputContent" name="content" rows="3" placeholder="More of such workshops please !!""></textarea>
+    </div>
+
+    <div>
+        <button type="submit" id="inputSubmit" class="btn btn-secondary">Send Post</button>
+    </div>    
+</form>
+
+<%- include ('../partials/footer'); -%>

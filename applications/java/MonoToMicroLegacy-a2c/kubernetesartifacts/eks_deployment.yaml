@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-tomcat-b96247b3-deployment
+  labels:
+    app: java-tomcat-b96247b3
+    release: initial
+    shortImageDigest: 4112de9e273d9f67d29bdb67
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-tomcat-b96247b3
+      release: initial
+  template:
+    metadata:
+      labels:
+        app: java-tomcat-b96247b3
+        release: initial
+    spec:
+      containers:
+      - name: java-tomcat-b96247b3
+        image: 547544589874.dkr.ecr.us-west-2.amazonaws.com/java-tomcat-b96247b3:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 8005
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "1.5"
+            memory: 3072Mi
+          limits:
+            cpu: "1.5"
+            memory: 3072Mi
