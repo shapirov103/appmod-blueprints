@@ -7,7 +7,7 @@ spec:
     - name: java-webservice 
       type: webservice
       properties:
-        image: public.ecr.aws/i8e1q7x5/appmod-demo:latest 
+        image: public.ecr.aws/i8e1q7x5/appmod-demo:a2cdemo
         port: 8080
       traits:
         - type: appingress
