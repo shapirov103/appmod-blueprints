@@ -59,6 +59,7 @@ Prereqs
 - Each account/region contains a basic EKS cluster that represents a non-modernized environment (such as on-prem)
 - Each account/region contains a VPC such as default with 3 public and 3 private subnets (optional, saves time on infra deployment) 
 
+## Module 1
 * Select application:
     1. nodejs app
     2. micronaut app
@@ -68,14 +69,21 @@ Prereqs
     -  app2container for 3
 * In local kubernetes instance
     - Go through creation of deployment artifacts for one service, such as deployment, HPA, secrets, service (lb ?), any policies, network, etc. 
-    - introduce OAM
-    - deploy kubevela through CLI
-    - create OAM for the app and deploy
+
+## Module 2 GitOps
 * Prepare for portability
     - Introduce ArgoCD
     - Deploy ArgoCD through CLI
-    - Create apps and app of apps
+    - Create apps and app of apps for one app with k8s descriptors (e.g java)
     - Deploy app of apps
+
+## Module 3 Kubevela 
+    - introduce OAM
+    - deploy kubevela through ArgoCD UI - e.g. create an app that points to the Kubevela chart in deployment/addons/kubevela
+    - create OAM for the node app and deploy with Kubevela (CLI)
+    - Clean up (destroy the hybrid cluster)
+
+## Module 4
 * Create infrastructure for dev/prod
     - Blueprint (use ootb) with ArgoCD and Kubevela, as well as Nginx, external DNS and external secrets
     - Add teams and secrets, create databases and queues and service accounts
@@ -83,6 +91,8 @@ Prereqs
     - Deploy dev
     - Replicate dev to prod with pipeline
     - Replace dev with new dev with apps in flight
+
+## Module 5
 * Promotions
     - Create dev apps of apps and prod app of apps
     - Introduce a change to the app and execute a no-op CICD process

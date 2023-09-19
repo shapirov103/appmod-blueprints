@@ -20,7 +20,7 @@ template: {
         type: *"internet-facing" | "internal"
     }
 
-    // trait template can have multiple outputs in one trait
+  // trait template can have multiple outputs in one trait
     outputs: service: {
         apiVersion: "v1"
         kind:       "Service"
@@ -67,5 +67,36 @@ template: {
                 }
             }]
         }
+    }
+
+    patch: {
+        metadata: annotations: {
+            "argocd.argoproj.io/compare-options": "IgnoreExtraneous"
+            "argocd.argoproj.io/sync-options": "Prune=false"
+        }
+    }
+
+    patchOutputs: {
+        for k, v in context.outputs {
+            "\(k)": {
+                metadata: annotations: {
+                    "argocd.argoproj.io/compare-options": "IgnoreExtraneous"
+                    "argocd.argoproj.io/sync-options":    "Prune=false"
+                }
+            }
+        }
+        service: {
+            metadata: annotations: {
+                "argocd.argoproj.io/compare-options": "IgnoreExtraneous"
+                "argocd.argoproj.io/sync-options": "Prune=false"
+            }
+        }
+        ingress: {
+            metadata: annotations: {
+                "argocd.argoproj.io/compare-options": "IgnoreExtraneous"
+                "argocd.argoproj.io/sync-options": "Prune=false"
+            }
+        }
+
     }
 }
