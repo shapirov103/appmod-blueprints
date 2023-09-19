@@ -69,17 +69,19 @@ Prereqs
     -  app2container for 3
 * In local kubernetes instance
     - Go through creation of deployment artifacts for one service, such as deployment, HPA, secrets, service (lb ?), any policies, network, etc. 
-## Module 2 Kubevela 
-    - introduce OAM
-    - deploy kubevela through CLI
-    - create OAM for the app and deploy
 
-## Module 3 GitOps
+## Module 2 GitOps
 * Prepare for portability
     - Introduce ArgoCD
     - Deploy ArgoCD through CLI
-    - Create apps and app of apps
+    - Create apps and app of apps for one app with k8s descriptors (e.g java)
     - Deploy app of apps
+
+## Module 3 Kubevela 
+    - introduce OAM
+    - deploy kubevela through ArgoCD UI - e.g. create an app that points to the Kubevela chart in deployment/addons/kubevela
+    - create OAM for the node app and deploy with Kubevela (CLI)
+    - Clean up (destroy the hybrid cluster)
 
 ## Module 4
 * Create infrastructure for dev/prod
@@ -89,6 +91,7 @@ Prereqs
     - Deploy dev
     - Replicate dev to prod with pipeline
     - Replace dev with new dev with apps in flight
+
 ## Module 5
 * Promotions
     - Create dev apps of apps and prod app of apps
