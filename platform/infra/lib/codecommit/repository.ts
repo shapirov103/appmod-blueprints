@@ -12,7 +12,7 @@ export default class CodeCommitStack extends Stack {
         CodeCommitStack.createCodeBundle("deployment", "applications");
         const repo = new codecommit.Repository(this, 'Repository', {
             repositoryName: 'appmod-workshop',
-            code: codecommit.Code.fromDirectory(join(__dirname, RELATIVE_ROOT, '.tmp')), // optional property, branch parameter can be omitted
+            code: codecommit.Code.fromDirectory(join(__dirname, RELATIVE_ROOT, 'workshop')), // optional property, branch parameter can be omitted
         });
 
         new CfnOutput(this, "Git Repository", {
@@ -28,7 +28,7 @@ export default class CodeCommitStack extends Stack {
      * Create code bundle under .tmp directory.
      */
     public static createCodeBundle(...relativePaths: string[]) {
-        const dir = join(__dirname, RELATIVE_ROOT, '.tmp');
+        const dir = join(__dirname, RELATIVE_ROOT, 'workshop');
 
         // if (fs.existsSync(dir)) {
         //     fs.rmSync(dir, { recursive: true, force: true });
