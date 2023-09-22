@@ -1,7 +1,8 @@
 version: 0.2
 
 env:
-    git-credential-helper: yes
+    variables:
+      IMAGE_TAG : "v1"
 phases:
   pre_build:
     commands:
@@ -11,8 +12,8 @@ phases:
       - "python --version"
       - python -m pip install -U pip
       - pip install git-remote-codecommit    
-      - echo Cloning Repo
-      - git clone https://git-codecommit.$AWS_DEFAULT_REGION.amazonaws.com/v1/repos/appmod-bp
+      - echo Logging in to CodeCommit
+      - git clone codecommit://appmod-bp
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
@@ -34,4 +35,3 @@ phases:
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NODE_IMAGE_REPO_NAME:$IMAGE_TAG
         fi
       - echo Build completed on `date`
-      - echo I DID IT
