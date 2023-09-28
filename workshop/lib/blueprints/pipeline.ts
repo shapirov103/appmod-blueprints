@@ -3,7 +3,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { StackProps } from 'aws-cdk-lib';
 import { VpcLookupByNameProvider } from './vpcprovider';
 
-const GIT_URL = "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/appmod-workshop";
+const GIT_URL = "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/appmod-workshop";
 
 export default class PipelineStack {
     static build(scope: Construct, props: StackProps) {
