@@ -134,6 +134,8 @@ dist
 platform/infra/cdk.context.json
 platform/infra/package-lock.json
 platform/infra/cdk.out
-
+package-lock.json
+cdk.out
+cdk.context.json
 # Code commit code bundle tmp files
 .tmp
