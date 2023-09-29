@@ -24,30 +24,14 @@ export default class PipelineStack {
             );
 
             const devBlueprint = blueprint.clone()
-                .addOns(new blueprints.ArgoCDAddOn({
-                    bootstrapRepo: {
-                        repoUrl: GIT_URL,
-                        targetRevision: "main",
-                        path: 'deployment/envs/dev',
-                        credentialsSecretName: 'argo-repo-secret',
-                        credentialsType: 'USERNAME'
-                    },
-                    adminPasswordSecretName: 'argocd-admin-secret',
-                }
-            ));
+                .addOns(    
+                    // Add dev AddOns
+                );
 
             const prodBlueprint = blueprint.clone()
-                .addOns(new blueprints.ArgoCDAddOn({
-                    bootstrapRepo: {
-                        repoUrl: GIT_URL,
-                        targetRevision: "main",
-                        path: 'deployment/envs/prod',
-                        credentialsSecretName: 'argo-repo-secret',
-                        credentialsType: 'USERNAME'
-                    },
-                    adminPasswordSecretName: 'argocd-admin-secret',
-                }
-            ));
+                .addOns(    
+                    // Add prod AddOns
+                );
 
             blueprints.CodePipelineStack.builder()
             .name("blueprints-pipeline")
