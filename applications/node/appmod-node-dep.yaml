@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: appmod-node
-        image: <to replace with ECR repo>
+        image: {{AWS_ACCOUNT_ID}}.dkr.ecr.{{AWS_DEFAULT_REGION}}.amazonaws.com/appmod-bp-node:latest
         ports:
         - containerPort: 8080
