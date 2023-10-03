@@ -11,7 +11,7 @@ export default class VpcStack extends Stack {
         this.vpc = new Vpc(this, "appmod-vpc", {
             vpcName: "appmod-vpc",
             maxAzs: 3,
-            ipAddresses: IpAddresses.cidr('192.168.0.0/16'),
+            ipAddresses: IpAddresses.cidr('10.0.0.0/16'),
             subnetConfiguration: [
                 {
                   cidrMask: 19,
