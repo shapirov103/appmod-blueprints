@@ -1,6 +1,5 @@
-import { Stack, StackProps } from "aws-cdk-lib";
+import { Stack, StackProps, Tags } from "aws-cdk-lib";
 import { IVpc, Vpc, SubnetType, IpAddresses, ISubnet } from "aws-cdk-lib/aws-ec2";
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from "constructs";
 
 export default class VpcStack extends Stack {
