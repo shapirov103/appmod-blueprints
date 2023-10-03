@@ -1,4 +1,4 @@
-"appmod-app": {
+"appmod-service": {
 	alias: ""
 	annotations: {}
 	attributes: workload: definition: {
@@ -61,8 +61,10 @@ template: {
                 port:       parameter.port
                 targetPort: parameter.targetPort
             }]
+            }
         }
     }
+
 	parameter: {
         image_name: string
         image: string
@@ -71,3 +73,4 @@ template: {
         targetPort: *8080 | int
     }
 }
+
