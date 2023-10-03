@@ -34,13 +34,12 @@ export default class VpcStack extends Stack {
             subnetType: SubnetType.PRIVATE_WITH_EGRESS
         }).subnets;
 
-        let clusterLabels: string[] = ['kubernetes.io/cluster/hybrid-cluster','kubernetes.io/cluster/dev-stage-blueprint', 'kubernetes.io/cluster/prod-stage-blueprint']
-        
-        let i = 0;
         privateSubnets.forEach((subnet) => {
             Tags.of(subnet).add('kubernetes.io/role/internal-elb', '1')
-            Tags.of(subnet).add(clusterLabels[i],'shared');
-            i++;
+            Tags.of(subnet).add('kubernetes.io/cluster/hybrid-cluster','shared');
+            Tags.of(subnet).add('kubernetes.io/cluster/dev-stage-blueprint','shared');
+            Tags.of(subnet).add('kubernetes.io/cluster/prod-stage-blueprint','shared');
+
         })
 
         publicSubnets.forEach((subnet) => {
