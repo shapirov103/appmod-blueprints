@@ -11,7 +11,7 @@ spec:
     namespace: team-k
     server: {{ .Values.spec.destination.server }}
   source:
-    repoURL: {{ .Values.repoURL }}
+    repoURL: {{ .Values.repoUrl }}
     targetRevision: {{ .Values.targetRevision }}
     path: deployment/teams/team-k/dev
   syncPolicy:
