@@ -8,6 +8,9 @@ export default class VpcStack extends Stack {
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
+
+        // Single VPC with 3 AZs, each AZ with public and private subnet.
+        // All subnets will be shared amongst the three clusters: hybrid, dev, and prod
         this.vpc = new Vpc(this, "appmod-vpc", {
             vpcName: "appmod-vpc",
             maxAzs: 3,
@@ -26,6 +29,8 @@ export default class VpcStack extends Stack {
             ]
         });
 
+        // Tagging each subnet
+
         const publicSubnets = this.vpc.selectSubnets({
             subnetType: SubnetType.PUBLIC
         }).subnets;
@@ -34,16 +39,20 @@ export default class VpcStack extends Stack {
             subnetType: SubnetType.PRIVATE_WITH_EGRESS
         }).subnets;
 
-        privateSubnets.forEach((subnet) => {
-            Tags.of(subnet).add('kubernetes.io/role/internal-elb', '1')
+        function assignClusterTags(subnet : ISubnet): void {
             Tags.of(subnet).add('kubernetes.io/cluster/hybrid-cluster','shared');
             Tags.of(subnet).add('kubernetes.io/cluster/dev-stage-blueprint','shared');
             Tags.of(subnet).add('kubernetes.io/cluster/prod-stage-blueprint','shared');
+        }
 
+        privateSubnets.forEach((subnet) => {
+            Tags.of(subnet).add('kubernetes.io/role/internal-elb', '1')
+            assignClusterTags(subnet)
         })
 
         publicSubnets.forEach((subnet) => {
             Tags.of(subnet).add('kubernetes.io/role/elb', '1')
+            assignClusterTags(subnet)
         })
     }
 }
