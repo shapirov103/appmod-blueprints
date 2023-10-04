@@ -1,7 +1,7 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application
 metadata:
-  name: first-app
+  name: progressive-app
 spec:
   components:
     - name: progressive-demo
@@ -15,4 +15,4 @@ spec:
           properties:
             domain: "*.amazonaws.com" 
             http:
-              /: 8080
+              /progressive: 8080
