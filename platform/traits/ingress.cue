@@ -18,21 +18,26 @@ template: {
         class: *"alb" | string
         targetType: *"ip" | string 
         type: *"internet-facing" | "internal"
+        createService: *false | bool
     }
 
   // trait template can have multiple outputs in one trait
-    outputs: service: {
-        apiVersion: "v1"
-        kind:       "Service"
-        metadata: name: context.name
-        spec: {
-            selector: "app.oam.dev/component": context.name
-            ports: [
-                for k, v in parameter.http {
-                    port:       v
-                    targetPort: v
-                },
-            ]
+    outputs: {
+        if parameter.createService {
+            service: {
+                apiVersion: "v1"
+                kind:       "Service"
+                metadata: name: context.name
+                spec: {
+                    selector: "app.oam.dev/component": context.name
+                    ports: [
+                        for k, v in parameter.http {
+                            port:       v
+                            targetPort: v
+                        },
+                    ]
+                }
+            }
         }
     }
 

@@ -4,13 +4,10 @@ metadata:
   name: first-app
 spec:
   components:
-    - name: helloworld
-      type: webservice
+    - name: progressive-demo
+      type: appmod-service
       properties:
-        image: oamdev/helloworld-python:v1
-        env:
-          - name: "TARGET"
-            value: "KubeVela"
+        image: argoproj/rollouts-demo:blue
         port: 8080
       traits:
         - type: appingress
