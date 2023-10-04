@@ -15,4 +15,4 @@ spec:
           properties:
             domain: "*.amazonaws.com" 
             http:
-              /progressive(/|$)(.*): 8080
+              /progressive: 8080

@@ -47,8 +47,7 @@ template: {
         metadata: {
             name: context.name
             annotations: {
-                "nginx.ingress.kubernetes.io/use-regex": "true"
-                "nginx.ingress.kubernetes.io/rewrite-target": "/$2"
+                "nginx.org/rewrites": "serviceName=\(context.name) rewrite=/"
             }
         }
         spec: {
@@ -58,7 +57,7 @@ template: {
                 http: {
                     paths: [
                         for k, v in parameter.http {
-                            path: "\(k)(/|$)(.*)"
+                            path: k
                             pathType: "ImplementationSpecific"
                             backend: {
                                 service: {

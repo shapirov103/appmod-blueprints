@@ -47,10 +47,7 @@ spec:
         	kind:       "Ingress"
         	metadata: {
         		name: context.name
-        		annotations: {
-        			"nginx.ingress.kubernetes.io/use-regex":      "true"
-        			"nginx.ingress.kubernetes.io/rewrite-target": "/$2"
-        		}
+        		annotations: "nginx.org/rewrites": "serviceName=\(context.name) rewrite=/"
         	}
         	spec: {
         		ingressClassName: parameter.class
@@ -58,7 +55,7 @@ spec:
         			host: parameter.domain
         			http: paths: [
         				for k, v in parameter.http {
-        					path:     "\(k)(/|$)(.*)"
+        					path:     k
         					pathType: "ImplementationSpecific"
         					backend: service: {
         						name: context.name
