@@ -11,7 +11,7 @@ spec:
         image_name: rollout-demo  
         port: 8080
       traits:
-        - type: appingress
+        - type: path-based-ingress
           properties:
             domain: "*.amazonaws.com" 
             http:
