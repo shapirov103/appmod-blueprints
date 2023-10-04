@@ -16,6 +16,7 @@ export default class HybridCluster {
                 new blueprints.MetricsServerAddOn,
                 new blueprints.ClusterAutoScalerAddOn,
                 new blueprints.SecretsStoreAddOn(),
+                new blueprints.NginxAddOn()
             )
             .build(scope, "hybrid-cluster");
     }

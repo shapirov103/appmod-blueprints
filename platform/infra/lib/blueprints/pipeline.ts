@@ -20,7 +20,8 @@ export default class PipelineStack {
                 new blueprints.VpcCniAddOn, 
                 new blueprints.MetricsServerAddOn,
                 new blueprints.ClusterAutoScalerAddOn,
-                new blueprints.SecretsStoreAddOn()
+                new blueprints.SecretsStoreAddOn(),
+                new blueprints.NginxAddOn()
             );
 
             const devBlueprint = blueprint.clone()
