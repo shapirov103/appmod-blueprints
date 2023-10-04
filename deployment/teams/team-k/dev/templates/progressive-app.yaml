@@ -1,0 +1,18 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: progressive-app
+spec:
+  components:
+    - name: progressive-demo
+      type: appmod-service
+      properties:
+        image: argoproj/rollouts-demo:blue
+        image_name: rollout-demo  
+        port: 8080
+      traits:
+        - type: path-based-ingress
+          properties:
+            domain: "*.amazonaws.com" 
+            http:
+              /progressive: 8080

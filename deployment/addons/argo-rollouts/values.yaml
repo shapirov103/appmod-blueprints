@@ -1,0 +1,3 @@
+argo-rollouts:
+  clusterInstall: true
+  createClusterAggregateRoles: true

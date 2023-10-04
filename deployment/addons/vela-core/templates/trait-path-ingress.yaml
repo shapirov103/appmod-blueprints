@@ -4,7 +4,7 @@ metadata:
   annotations:
     definition.oam.dev/description: Ingress route trait.
   labels: {}
-  name: appingress
+  name: path-based-ingress
   namespace: vela-system
 spec:
   appliesToWorkloads: []
@@ -16,7 +16,7 @@ spec:
         parameter: {
         	domain: string
         	http: [string]: int
-        	class:         *"alb" | string
+        	class:         *"nginx" | string
         	targetType:    *"ip" | string
         	type:          *"internet-facing" | "internal"
         	createService: *false | bool
@@ -47,11 +47,7 @@ spec:
         	kind:       "Ingress"
         	metadata: {
         		name: context.name
-        		annotations: {
-        			"alb.ingress.kubernetes.io/target-type": parameter.targetType
-        			"alb.ingress.kubernetes.io/scheme":      parameter.type
-        			"alb.ingress.kubernetes.io/group.name":  parameter.type
-        		}
+        		annotations: "nginx.org/rewrites": "serviceName=\(context.name) rewrite=/"
         	}
         	spec: {
         		ingressClassName: parameter.class
