@@ -8,6 +8,7 @@ spec:
       type: appmod-service
       properties:
         image: argoproj/rollouts-demo:blue
+        image_name: rollout-demo  
         port: 8080
       traits:
         - type: appingress

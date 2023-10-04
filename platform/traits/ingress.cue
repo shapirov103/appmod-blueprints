@@ -90,10 +90,12 @@ template: {
                 }
             }
         }
-        service: {
-            metadata: annotations: {
-                "argocd.argoproj.io/compare-options": "IgnoreExtraneous"
-                "argocd.argoproj.io/sync-options": "Prune=false"
+        if parameter.createService {
+            service: {
+                metadata: annotations: {
+                    "argocd.argoproj.io/compare-options": "IgnoreExtraneous"
+                    "argocd.argoproj.io/sync-options": "Prune=false"
+                }
             }
         }
         ingress: {
