@@ -1,4 +1,4 @@
-"appingress": {
+"path-based-ingress": {
     annotations: {}
     attributes: {
         appliesToWorkloads: []
@@ -15,7 +15,7 @@ template: {
     parameter: {
         domain: string
         http: [string]: int
-        class: *"alb" | string
+        class: *"nginx" | string
         targetType: *"ip" | string 
         type: *"internet-facing" | "internal"
         createService: *false | bool
@@ -47,9 +47,7 @@ template: {
         metadata: {
             name: context.name
             annotations: {
-                "alb.ingress.kubernetes.io/target-type": parameter.targetType 
-                "alb.ingress.kubernetes.io/scheme": parameter.type
-                "alb.ingress.kubernetes.io/group.name": parameter.type
+                "nginx.org/rewrites": "serviceName=\(context.name) rewrite=/"
             }
         }
         spec: {

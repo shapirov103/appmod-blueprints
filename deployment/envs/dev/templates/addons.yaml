@@ -11,8 +11,8 @@ spec:
     namespace: argocd
     server: {{ .Values.spec.destination.server }}
   source:
-    repoURL: {{ .Values.spec.source.repoURL }}
-    targetRevision: {{ .Values.spec.source.targetRevision }}
+    repoURL: {{ .Values.repoUrl }}
+    targetRevision: {{ .Values.targetRevision }}
     path: deployment/addons
     helm:
       values: |
