@@ -1,0 +1,49 @@
+version: 0.2
+
+
+env:
+    variables:
+      IMAGE_TAG : "v1.4"
+      AWS_DEFAULT_REGION: "us-west-2"
+      JAVA_IMAGE_REPO_NAME: "appmod-java-ecr"
+      
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+      
+  pre_build:
+    commands:
+      - echo "STARTING PYTHON INSTALLATION"
+      - pip3 install git-remote-codecommit
+      - echo Logging in to CodeCommit
+      - mkdir /opt/gradle
+      - wget -c https://services.gradle.org/distributions/gradle-4.2.1-bin.zip
+      - unzip -d /opt/gradle gradle-4.2.1-bin.zip
+      - export PATH=$PATH:/opt/gradle/gradle-4.2.1/bin
+      - yum -y install docker java-1.8.0
+      - rm -rf gradle-4.2.1-bin.zip
+      - git clone codecommit://appmod-workshop
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 857465957396.dkr.ecr.us-west-2.amazonaws.com
+  build:
+    commands:
+      - echo Build started on `date`
+      - cd appmod-workshop/applications/java/sample-java
+      - gradle clean build
+      - cp build/libs/sample-java.war .
+      - docker build -t appmod-java-ecr:1.5 .
+      - docker tag appmod-java-ecr:1.5 857465957396.dkr.ecr.us-west-2.amazonaws.com/appmod-java-ecr:1.5
+      - docker push 857465957396.dkr.ecr.us-west-2.amazonaws.com/appmod-java-ecr:1.5
+        
+      - echo Build completed on `date`
+      - echo "Updating the application version"
+      - cd ../../../deployment/teams/team-j/dev/templates/
+      - myvar=`grep image java-application.yaml | awk -F':' '{print $3}'`
+      - sed -i "s/$myvar/1.5/g" java-application.yaml
+      - cd ../../../../..
+      - git config --global user.email "codebuild@email.com"
+      - git config --global user.name "CodeBuild user"
+      - git add -A
+      - git commit -m "Changed DEV Version $myvar"
+      - git push
