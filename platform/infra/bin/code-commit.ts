@@ -1,5 +1,3 @@
-import  HybridCluster from '../lib/blueprints/hybrid';
-import PipelineStack from '../lib/blueprints/pipeline';
 import CodeCommitStack from '../lib/codecommit/repository';
 import * as cdk from 'aws-cdk-lib';
 
@@ -11,9 +9,5 @@ const props: cdk.StackProps = {
         region: 'us-west-2'
     }
 }
-
-
-HybridCluster.build(app);
-PipelineStack.build(app, props);
 
 new CodeCommitStack(app, 'code-commit-repo', props);
