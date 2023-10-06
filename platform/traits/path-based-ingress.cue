@@ -46,7 +46,8 @@ template: {
         metadata: {
             name: context.name
             annotations: {
-                "nginx.org/rewrites": "serviceName=\(context.name) rewrite=\(parameter.rewwritePath)"
+                "nginx.org/rewrites": "serviceName=\(context.name) rewrite=\(parameter.rewritePath)"
+                "nginx.org/mergeable-ingress-type": "minion"
             }
         }
         spec: {
