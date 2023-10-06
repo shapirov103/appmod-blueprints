@@ -8,6 +8,7 @@ spec:
       type: appmod-service
       properties:
         image: public.ecr.aws/i8e1q7x5/appmod-demo:latest 
+        image_name: java-app
         port: 8080
       traits:
         - type: path-based-ingress
