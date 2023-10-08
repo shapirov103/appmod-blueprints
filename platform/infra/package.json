@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@aws-quickstart/eks-blueprints": "^1.11.3",
-    "aws-cdk": "2.91.0",
-    "aws-cdk-lib": "2.91.0"
+    "@aws-quickstart/eks-blueprints": "1.12.0",
+    "aws-cdk": "2.99.1",
+    "aws-cdk-lib": "2.99.1"
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
