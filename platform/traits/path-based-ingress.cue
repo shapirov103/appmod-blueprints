@@ -16,8 +16,7 @@ template: {
         domain: string
         http: [string]: int
         class: *"nginx" | string
-        targetType: *"ip" | string 
-        type: *"internet-facing" | "internal"
+        rewritePath: *"/" | string
         createService: *false | bool
     }
 
@@ -47,7 +46,8 @@ template: {
         metadata: {
             name: context.name
             annotations: {
-                "nginx.org/rewrites": "serviceName=\(context.name) rewrite=/"
+                "nginx.org/rewrites": "serviceName=\(context.name) rewrite=\(parameter.rewritePath)"
+                "nginx.org/mergeable-ingress-type": "minion"
             }
         }
         spec: {

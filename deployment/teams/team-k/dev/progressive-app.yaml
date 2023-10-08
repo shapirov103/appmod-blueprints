@@ -14,5 +14,6 @@ spec:
         - type: path-based-ingress
           properties:
             domain: "*.amazonaws.com" 
+            rewritePath: "/"
             http:
-              /progressive: 8080
+              /progressive/: 8080
