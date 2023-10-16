@@ -5,8 +5,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   registries: '{
-  "KubeVela":{
-    "name": "KubeVela",
+  "kubevela":{
+    "name": "kubevela",
     "helm": {
       "url": "https://kubevela.github.io/catalog/official"
     }
