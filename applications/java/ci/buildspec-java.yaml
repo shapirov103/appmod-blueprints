@@ -3,7 +3,7 @@ version: 0.2
 
 env:
     variables:
-      IMAGE_TAG : "v1.4"
+      IMAGE_TAG : "v1alpha1"
       AWS_DEFAULT_REGION: "us-west-2"
       JAVA_IMAGE_REPO_NAME: "appmod-java-ecr"
       
@@ -18,11 +18,11 @@ phases:
       - pip3 install git-remote-codecommit
       - echo Logging in to CodeCommit
       - mkdir /opt/gradle
-      - wget -c https://services.gradle.org/distributions/gradle-4.2.1-bin.zip
-      - unzip -d /opt/gradle gradle-4.2.1-bin.zip
-      - export PATH=$PATH:/opt/gradle/gradle-4.2.1/bin
+      - wget -c https://services.gradle.org/distributions/gradle-8.4-bin.zip
+      - unzip -d /opt/gradle gradle-8.4-bin.zip
+      - export PATH=$PATH:/opt/gradle/gradle-8.4/bin
       - yum -y install docker java-1.8.0
-      - rm -rf gradle-4.2.1-bin.zip
+      - rm -rf gradle-8.4-bin.zip
       - git clone codecommit://appmod-workshop
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com
