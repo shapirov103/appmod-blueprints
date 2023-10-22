@@ -14,6 +14,6 @@ spec:
         - type: path-based-ingress
           properties:
             domain: "*.amazonaws.com"
-            rewritePath: "/app" 
+            rewritePath: "/java-app" 
             http:
               /java-app: 8080
