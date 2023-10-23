@@ -46,7 +46,7 @@ export default class PipelineStack {
                 stackBuilder: devBlueprint.clone()
             })
             .stage({
-                id: 'prod-state',
+                id: 'prod-stage',
                 stackBuilder: prodBlueprint.clone(),
                 stageProps: {
                     pre: [new blueprints.pipelines.cdkpipelines.ManualApprovalStep('manual-approval')]
