@@ -29,9 +29,9 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - cd appmod-workshop/applications/java/sample-java
+      - cd appmod-workshop/applications/java/src
       - gradle clean build
-      - cp build/libs/sample-java.war .
+      - cp build/libs/*.war .
       - docker build -t$JAVA_IMAGE_REPO_NAME:$IMAGE_TAG .
       - docker tag $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/appmod-java-ecr:$IMAGE_TAG

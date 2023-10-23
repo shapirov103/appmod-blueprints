@@ -20,18 +20,18 @@ phases:
     commands:
       - echo Build started on `date`
       - cd appmod-workshop
-      - echo $( git diff HEAD^ -- applications/node/ | wc -l )
+      - echo $( git diff HEAD^ -- applications/node/src | wc -l )
       - |
         echo Building the Node image...
         if [ $( git diff HEAD^ -- applications/node/ | wc -l ) -gt 0 ]; then
-          docker build -t $NODE_IMAGE_REPO_NAME:$IMAGE_TAG ./applications/node/
+          docker build -t $NODE_IMAGE_REPO_NAME:$IMAGE_TAG ./applications/node/src
           docker tag $NODE_IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NODE_IMAGE_REPO_NAME:$IMAGE_TAG
         fi
   post_build:
     commands:
       - |
         echo Pushing the Node image...
-        if [ $( git diff HEAD^ -- applications/node/ | wc -l ) -gt 0 ]; then
+        if [ $( git diff HEAD^ -- applications/node/src | wc -l ) -gt 0 ]; then
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NODE_IMAGE_REPO_NAME:$IMAGE_TAG
         fi
       - echo Build completed on `date`
