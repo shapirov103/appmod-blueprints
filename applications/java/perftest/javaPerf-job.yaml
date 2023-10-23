@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: javaperftest
+spec:
+  template:
+    spec:
+      containers:
+      - name: javaperftest
+        image: public.ecr.aws/i8e1q7x5/javaperftest:latest
+        args: ["k8s-kubesyst-blueprin-8bec7badbc-8ff52b36b01c1ee9.elb.us-west-2.amazonaws.com"]
+      restartPolicy: Never
+
