@@ -23,31 +23,53 @@ template: {
 			selector: matchLabels: app: context.name
 			strategy: canary: steps: [{
 				setWeight: 20
-			}, {
-				pause: duration: "20s"
+			}, 
+			if(parameter.functionalGate != _|_) {
+				{
+					pause: duration: parameter.functionGate.duration
+				},
+				{
+					analysis: {
+						templates: [
+							{
+								templateName: "functional-gate-\(context.name)"
+							}
+						],
+						args: [
+							{
+								name: "service-name",
+								value: name: "\(context.name)-preview"
+							}
+						]
+					}
+            	}
 			}, {
 				setWeight: 40
 			}, {
-				pause: duration: "20s"
+				pause: duration: "10s"
 			}, {
 				setWeight: 80
-			}, {
-				pause: duration: "60s"
-			},{
-                analysis: {
-                    templates: [
-                        {
-                            templateName: "functional-gate-\(context.name)"
-                        }
-                    ],
-                    args: [
-                        {
-                            name: "service-name",
-                            value: context.name
-                        }
-                    ]
-                }
-            }
+			}, 			
+			if(parameter.performanceGate != _|_) {
+				{
+					pause: duration: parameter.performanceGate.duration
+				},
+				{
+					analysis: {
+						templates: [
+							{
+								templateName: "performance-gate-\(context.name)"
+							}
+						],
+						args: [
+							{
+								name: "service-name",
+								value: name: "\(context.name)-preview"
+							}
+						]
+					}
+            	}
+			}
             ]
 			template: {
 				metadata: labels: app: context.name
@@ -68,55 +90,71 @@ template: {
             kind:       "Service"
             metadata: name: context.name
             spec: {
-            selector: {
-                app: context.name
-            }
-            ports: [{
-                port:       parameter.port
-                targetPort: parameter.targetPort
-            }]
+				selector: app: context.name
+				ports: [{
+					port:       parameter.port
+					targetPort: parameter.targetPort
+	            }]
             }
         },
-        "appmod-functional-analysis-template": {
-            kind: "AnalysisTemplate",
-            apiVersion: "argoproj.io/v1alpha1",
-            metadata: {
-                name: "functional-gate-\(context.name)"
-            },
+		"appmod-service-preview": {
+            apiVersion: "v1"
+            kind:       "Service"
+            metadata: name: "\(context.name)-preview"
             spec: {
-                metrics: [
-                    {
-                        "name": "\(context.name)-metrics",
-                        "provider": {
-                            "job": {
-                                "spec": {
-                                    "template": {
-                                        "spec": {
-                                            "containers": [
-                                                {
-                                                    "name": "sleep",
-                                                    "image": "alpine:3.8",
-                                                    "command": [
-                                                        "sh",
-                                                        "-c"
-                                                    ],
-                                                    "args": [
-                                                        "exit 0"
-                                                    ]
-                                                }
-                                            ],
-                                            "restartPolicy": "Never"
-                                        }
-                                    },
-                                    "backoffLimit": 0
-                                }
-                            }
-                        }
-                    }
-                ]
+				selector: app: context.name
+				ports: [{
+					port:       parameter.port
+					targetPort: parameter.targetPort
+				}]
             }
-        }
+        }, 
+		if parameter.functionalGate != _|_ {
+			"appmod-functional-analysis-template": {
+				kind: "AnalysisTemplate",
+				apiVersion: "argoproj.io/v1alpha1",
+				metadata: {
+					name: "functional-gate-\(context.name)"
+				},
+				spec: {
+					metrics: [
+						{
+							"name": "\(context.name)-metrics",
+							"provider": {
+								"job": {
+									"spec": {
+										"template": {
+											"spec": {
+												"containers": [
+													{
+														"name": "test",
+														"image": parameter.functionalGate.image,
+														"args": [
+															"\(context.name)-preview",
+															"\(parameter.functionalGate.extraArgs)"
+															
+														]
+													}
+												],
+												"restartPolicy": "Never"
+											}
+										},
+										"backoffLimit": 0
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		}
     }
+
+	#QualityGate: {
+		image: string
+		duration: string
+		extraArgs: *"" | string 
+	}
 
 	parameter: {
         image_name: string
@@ -124,6 +162,8 @@ template: {
         replicas: *3 | int
         port: *80 | int
         targetPort: *8080 | int
+		functionalGate?: #QualityGate
+		performanceGate?: #QualityGate
     }
 }
 
