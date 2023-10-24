@@ -11,27 +11,36 @@ phases:
       - "tar xf python.tgz -C /usr/bin/"
       - "python --version"
       - python -m pip install -U pip
-      - pip install git-remote-codecommit    
+      - pip install git-remote-codecommit
       - echo Logging in to CodeCommit
-      - git clone codecommit://appmod-bp
+      - git clone codecommit://appmod-workshop
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo Build started on `date`
-      - cd appmod-bp
-      - echo $( git diff HEAD^ -- node/ | wc -l )    
+      - cd appmod-workshop
+      - echo $( git diff HEAD^ -- applications/node/src | wc -l )
       - |
         echo Building the Node image...
-        if [ $( git diff HEAD^ -- node/ | wc -l ) -gt 0 ]; then
-          docker build -t $NODE_IMAGE_REPO_NAME:$IMAGE_TAG ./node/
+        if [ $( git diff HEAD^ -- applications/node/ | wc -l ) -gt 0 ]; then
+          docker build -t $NODE_IMAGE_REPO_NAME:$IMAGE_TAG ./applications/node/src
           docker tag $NODE_IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NODE_IMAGE_REPO_NAME:$IMAGE_TAG
         fi
   post_build:
     commands:
       - |
         echo Pushing the Node image...
-        if [ $( git diff HEAD^ -- node/ | wc -l ) -gt 0 ]; then
+        if [ $( git diff HEAD^ -- applications/node/src | wc -l ) -gt 0 ]; then
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NODE_IMAGE_REPO_NAME:$IMAGE_TAG
         fi
       - echo Build completed on `date`
+      - cd deployment/teams/team-n/dev
+      - myvar=`grep image node-application.yaml | awk -F':' '{print $3}'`
+      - sed -i "s/$myvar/$IMAGE_TAG/g" node-application.yaml
+      - cd ../../../../..
+      - git config --global user.email "codebuild@email.com"
+      - git config --global user.name "CodeBuild user"
+      - git add -A
+      - git commit -m "Changed DEV Version $myvar"
+      - git push

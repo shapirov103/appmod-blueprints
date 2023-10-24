@@ -134,7 +134,6 @@ dist
 platform/infra/cdk.context.json
 platform/infra/package-lock.json
 platform/infra/cdk.out
-
 workshop/applications
 workshop/deployment
 workshop/cdk.context.json

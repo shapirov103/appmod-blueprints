@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kubevela 
+  name: nginx-main-ingress
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: vela-system 
+    namespace: default
     server: {{ .Values.spec.destination.server }}
   project: default
   source:
-    path: deployment/addons/vela-core
+    path: deployment/addons/nginx-main-ingress
     repoURL: {{ .Values.repoUrl }}
     targetRevision: {{ .Values.targetRevision }}
   syncPolicy:

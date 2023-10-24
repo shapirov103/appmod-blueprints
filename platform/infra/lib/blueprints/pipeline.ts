@@ -20,7 +20,8 @@ export default class PipelineStack {
                 new blueprints.VpcCniAddOn, 
                 new blueprints.MetricsServerAddOn,
                 new blueprints.ClusterAutoScalerAddOn,
-                new blueprints.SecretsStoreAddOn()
+                new blueprints.SecretsStoreAddOn(),
+                new blueprints.NginxAddOn()
             );
 
             const devBlueprint = blueprint.clone()
@@ -61,7 +62,7 @@ export default class PipelineStack {
                 stackBuilder: devBlueprint.clone()
             })
             .stage({
-                id: 'prod-state',
+                id: 'prod-stage',
                 stackBuilder: prodBlueprint.clone(),
                 stageProps: {
                     pre: [new blueprints.pipelines.cdkpipelines.ManualApprovalStep('manual-approval')]

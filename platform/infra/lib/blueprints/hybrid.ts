@@ -16,10 +16,11 @@ export default class HybridCluster {
                 new blueprints.MetricsServerAddOn,
                 new blueprints.ClusterAutoScalerAddOn,
                 new blueprints.SecretsStoreAddOn(),
+                new blueprints.NginxAddOn(),
                 new blueprints.ArgoCDAddOn({
                    bootstrapRepo: {
                      repoUrl: GIT_URL,
-                        targetRevision: "main",
+                        targetRevision: "feature/progressive-delivery",
                         path: 'deployment/envs/dev',
                         credentialsSecretName: 'github-ssh-key',
                         credentialsType: 'SSH'
