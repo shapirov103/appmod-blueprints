@@ -24,20 +24,31 @@ template: {
 			strategy: canary: steps: [{
 				setWeight: 20
 			}, {
-				pause: duration: "120s"
+				pause: duration: "20s"
 			}, {
 				setWeight: 40
-			}, {
-				pause: duration: "40s"
-			}, {
-				setWeight: 60
 			}, {
 				pause: duration: "20s"
 			}, {
 				setWeight: 80
 			}, {
-				pause: duration: "20s"
-			}]
+				pause: duration: "60s"
+			},{
+                analysis: {
+                    templates: [
+                        {
+                            templateName: "functional-gate-\(context.name)"
+                        }
+                    ],
+                    args: [
+                        {
+                            name: "service-name",
+                            value: context.name
+                        }
+                    ]
+                }
+            }
+            ]
 			template: {
 				metadata: labels: app: context.name
 				spec: containers: [{
@@ -64,6 +75,45 @@ template: {
                 port:       parameter.port
                 targetPort: parameter.targetPort
             }]
+            }
+        },
+        "appmod-functional-analysis-template": {
+            kind: "AnalysisTemplate",
+            apiVersion: "argoproj.io/v1alpha1",
+            metadata: {
+                name: "functional-gate-\(context.name)"
+            },
+            spec: {
+                metrics: [
+                    {
+                        "name": "\(context.name)-metrics",
+                        "provider": {
+                            "job": {
+                                "spec": {
+                                    "template": {
+                                        "spec": {
+                                            "containers": [
+                                                {
+                                                    "name": "sleep",
+                                                    "image": "alpine:3.8",
+                                                    "command": [
+                                                        "sh",
+                                                        "-c"
+                                                    ],
+                                                    "args": [
+                                                        "exit 0"
+                                                    ]
+                                                }
+                                            ],
+                                            "restartPolicy": "Never"
+                                        }
+                                    },
+                                    "backoffLimit": 0
+                                }
+                            }
+                        }
+                    }
+                ]
             }
         }
     }
