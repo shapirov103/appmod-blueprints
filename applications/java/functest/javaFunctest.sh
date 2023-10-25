@@ -5,13 +5,6 @@ echo "The expected color is defined by the input parameter. Failure: if the colo
 
 echo "The number of arguments is: $#"
 a=$#
-if [ $a -ne 2 ]
-then
- 
-echo "Two parameters are expected"
-exit 1
-
-fi
 
 clusterIP=$1
 failedColor=$2

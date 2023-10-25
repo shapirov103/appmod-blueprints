@@ -5,7 +5,7 @@ echo "Based on the input parameter, color marked will be deemded as functionalit
 echo "Please enter the Java application ingress url"
 echo "The number of arguments is: $#"
 a=$#
-if [ $a -ne 1 ]
+if [ $a -le 1 ]
 then
  
 echo "One parameter is expected"
