@@ -27,8 +27,10 @@ spec:
         			},
         			if parameter.functionalGate != _|_ {
         				{
-        					pause: duration: parameter.functionalGate.duration
+        					pause: duration: parameter.functionalGate.pause
         				}
+        			},
+        			if parameter.functionalGate != _|_ {
         				{
         					analysis: {
         						templates: [
@@ -44,13 +46,16 @@ spec:
         						]
         					}
         				}
-        			}, {
+        			},
+        			{
         				setWeight: 80
         			},
         			if parameter.performanceGate != _|_ {
         				{
-        					pause: duration: parameter.performanceGate.duration
+        					pause: duration: parameter.performanceGate.pause
         				}
+        			},
+        			if parameter.performanceGate != _|_ {
         				{
         					analysis: {
         						templates: [
@@ -168,7 +173,7 @@ spec:
 
         #QualityGate: {
         	image:     string
-        	duration:  string
+        	pause:     string
         	extraArgs: *"" | string
         }
 

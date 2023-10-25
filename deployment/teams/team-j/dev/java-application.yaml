@@ -10,14 +10,14 @@ spec:
         image: public.ecr.aws/i8e1q7x5/appmod-demo:latest 
         image_name: java-app
         port: 8080
-        functionalGate:
-          duration: "30s" 
-          image: "public.ecr.aws/i8e1q7x5/appmod-javafunctest:latest"
-          extraArgs: "orange"
-        performanceGate:
-          duration: "60s"
-          image: "public.ecr.aws/i8e1q7x5/javaperftest:latest"
-      traits:
+        # functionalGate:
+        #   pause: "10s" 
+        #   image: "public.ecr.aws/i8e1q7x5/appmod-javafunctest:latest"
+        #   extraArgs: "orange"
+        # performanceGate:
+        #   pause: "10s"
+        #   image: "public.ecr.aws/i8e1q7x5/javaperftest:latest"
+      traits: 
         - type: path-based-ingress
           properties:
             domain: "*.amazonaws.com"
