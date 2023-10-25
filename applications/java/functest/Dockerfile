@@ -7,5 +7,5 @@ COPY javaFunctest.sh /
 RUN chmod +x /javaFunctest.sh
 # Set the entrypoint to the script with CMD arguments
 ENTRYPOINT ["/javaFunctest.sh"]
-CMD ["hulk", "batman"]
+CMD ["INGRESS_URL", "SUCCESS_COLOUR"]
 
