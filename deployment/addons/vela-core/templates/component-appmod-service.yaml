@@ -10,7 +10,9 @@ metadata:
 spec:
   schematic:
     cue:
-      template: |
+      template: |2
+        let previewService = "\(context.name)-preview"
+
         output: {
         	apiVersion: "argoproj.io/v1alpha1"
         	kind:       "Rollout"
@@ -19,33 +21,52 @@ spec:
         		replicas:             parameter.replicas
         		revisionHistoryLimit: 2
         		selector: matchLabels: app: context.name
-        		strategy: canary: steps: [{
-        			setWeight: 20
-        		}, {
-        			pause: duration: "20s"
-        		}, {
-        			setWeight: 40
-        		}, {
-        			pause: duration: "20s"
-        		}, {
-        			setWeight: 80
-        		}, {
-        			pause: duration: "60s"
-        		}, {
-        			analysis: {
-        				templates: [
-        					{
-        						templateName: "functional-gate-\(context.name)"
-        					},
-        				]
-        				args: [
-        					{
-        						name:  "service-name"
-        						value: context.name
-        					},
-        				]
-        			}
-        		},
+        		strategy: canary: steps: [
+        			{
+        				setWeight: 20
+        			},
+        			if parameter.functionalGate != _|_ {
+        				{
+        					pause: duration: parameter.functionalGate.duration
+        				}
+        				{
+        					analysis: {
+        						templates: [
+        							{
+        								templateName: "functional-gate-\(context.name)"
+        							},
+        						]
+        						args: [
+        							{
+        								name:  "service-name"
+        								value: previewService
+        							},
+        						]
+        					}
+        				}
+        			}, {
+        				setWeight: 80
+        			},
+        			if parameter.performanceGate != _|_ {
+        				{
+        					pause: duration: parameter.performanceGate.duration
+        				}
+        				{
+        					analysis: {
+        						templates: [
+        							{
+        								templateName: "performance-gate-\(context.name)"
+        							},
+        						]
+        						args: [
+        							{
+        								name:  "service-name"
+        								value: previewService
+        							},
+        						]
+        					}
+        				}
+        			},
         		]
         		template: {
         			metadata: labels: app: context.name
@@ -73,43 +94,92 @@ spec:
         			}]
         		}
         	}
-        	"appmod-functional-analysis-template": {
-        		kind:       "AnalysisTemplate"
-        		apiVersion: "argoproj.io/v1alpha1"
-        		metadata: name: "functional-gate-\(context.name)"
-        		spec: metrics: [
-        			{
-        				name: "\(context.name)-metrics"
-        				provider: job: spec: {
-        					template: spec: {
-        						containers: [
-        							{
-        								name:  "sleep"
-        								image: "alpine:3.8"
-        								command: [
-        									"sh",
-        									"-c",
-        								]
-        								args: [
-        									"exit 0",
-        								]
-        							},
-        						]
-        						restartPolicy: "Never"
+        	"appmod-service-preview": {
+        		apiVersion: "v1"
+        		kind:       "Service"
+        		metadata: name: previewService
+        		spec: {
+        			selector: app: context.name
+        			ports: [{
+        				port:       parameter.port
+        				targetPort: parameter.targetPort
+        			}]
+        		}
+        	}
+        	if parameter.functionalGate != _|_ {
+        		"appmod-functional-analysis-template": {
+        			kind:       "AnalysisTemplate"
+        			apiVersion: "argoproj.io/v1alpha1"
+        			metadata: name: "functional-gate-\(context.name)"
+        			spec: metrics: [
+        				{
+        					name: "\(context.name)-metrics"
+        					provider: job: spec: {
+        						template: spec: {
+        							containers: [
+        								{
+        									name:  "test"
+        									image: parameter.functionalGate.image
+        									args: [
+        										previewService,
+        										"\(parameter.functionalGate.extraArgs)",
+
+        									]
+        								},
+        							]
+        							restartPolicy: "Never"
+        						}
+        						backoffLimit: 0
         					}
-        					backoffLimit: 0
-        				}
-        			},
-        		]
+        				},
+        			]
+        		}
+        	}
+        	if parameter.performanceGate != _|_ {
+        		"appmod-performance-analysis-template": {
+        			kind:       "AnalysisTemplate"
+        			apiVersion: "argoproj.io/v1alpha1"
+        			metadata: name: "performance-gate-\(context.name)"
+        			spec: metrics: [
+        				{
+        					name: "\(context.name)-metrics"
+        					provider: job: spec: {
+        						template: spec: {
+        							containers: [
+        								{
+        									name:  "test"
+        									image: parameter.performanceGate.image
+        									args: [
+        										previewService,
+        										"\(parameter.performanceGate.extraArgs)",
+
+        									]
+        								},
+        							]
+        							restartPolicy: "Never"
+        						}
+        						backoffLimit: 0
+        					}
+        				},
+        			]
+        		}
         	}
         }
 
+        #QualityGate: {
+        	image:     string
+        	duration:  string
+        	extraArgs: *"" | string
+        }
+
         parameter: {
-        	image_name: string
-        	image:      string
-        	replicas:   *3 | int
-        	port:       *80 | int
-        	targetPort: *8080 | int
+        	image_name:       string
+        	image:            string
+        	replicas:         *3 | int
+        	port:             *80 | int
+        	targetPort:       *8080 | int
+        	functionalGate?:  #QualityGate
+        	performanceGate?: #QualityGate
         }
   workload:
     definition:

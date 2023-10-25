@@ -11,6 +11,9 @@
 }
 
 template: {
+
+    let previewService = "\(context.name)-preview"
+
 	output: {
 		apiVersion: "argoproj.io/v1alpha1"
 		kind:       "Rollout"
@@ -21,12 +24,13 @@ template: {
 			replicas:             parameter.replicas
 			revisionHistoryLimit: 2
 			selector: matchLabels: app: context.name
-			strategy: canary: steps: [{
-				setWeight: 20
-			}, 
-			if(parameter.functionalGate != _|_) {
+			strategy: canary: steps: [
+                {
+				    setWeight: 20
+			    },
+			if parameter.functionalGate != _|_ {
 				{
-					pause: duration: parameter.functionGate.duration
+					pause: duration: parameter.functionalGate.duration
 				},
 				{
 					analysis: {
@@ -38,21 +42,19 @@ template: {
 						args: [
 							{
 								name: "service-name",
-								value: name: "\(context.name)-preview"
+								value: previewService
 							}
 						]
 					}
             	}
 			}, {
-				setWeight: 40
-			}, {
-				pause: duration: "10s"
-			}, {
 				setWeight: 80
 			}, 			
-			if(parameter.performanceGate != _|_) {
+			if parameter.performanceGate != _|_ {
 				{
-					pause: duration: parameter.performanceGate.duration
+					pause: {
+                        duration: parameter.performanceGate.duration
+                    }
 				},
 				{
 					analysis: {
@@ -64,7 +66,7 @@ template: {
 						args: [
 							{
 								name: "service-name",
-								value: name: "\(context.name)-preview"
+								value: previewService
 							}
 						]
 					}
@@ -100,7 +102,7 @@ template: {
 		"appmod-service-preview": {
             apiVersion: "v1"
             kind:       "Service"
-            metadata: name: "\(context.name)-preview"
+            metadata: name: previewService
             spec: {
 				selector: app: context.name
 				ports: [{
@@ -130,8 +132,47 @@ template: {
 														"name": "test",
 														"image": parameter.functionalGate.image,
 														"args": [
-															"\(context.name)-preview",
+															previewService,
 															"\(parameter.functionalGate.extraArgs)"
+															
+														]
+													}
+												],
+												"restartPolicy": "Never"
+											}
+										},
+										"backoffLimit": 0
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		}
+        if parameter.performanceGate != _|_ {
+			"appmod-performance-analysis-template": {
+				kind: "AnalysisTemplate",
+				apiVersion: "argoproj.io/v1alpha1",
+				metadata: {
+					name: "performance-gate-\(context.name)"
+				},
+				spec: {
+					metrics: [
+						{
+							"name": "\(context.name)-metrics",
+							"provider": {
+								"job": {
+									"spec": {
+										"template": {
+											"spec": {
+												"containers": [
+													{
+														"name": "test",
+														"image": parameter.performanceGate.image,
+														"args": [
+															previewService,
+															"\(parameter.performanceGate.extraArgs)"
 															
 														]
 													}
