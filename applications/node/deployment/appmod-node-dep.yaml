@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appmod-node-deployment
+  name: node-appmod-deployment
 spec:
   selector:
     matchLabels:
