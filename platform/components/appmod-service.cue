@@ -24,66 +24,70 @@ template: {
 			replicas:             parameter.replicas
 			revisionHistoryLimit: 2
 			selector: matchLabels: app: context.name
-			strategy: canary: steps: [
-                {
-				    setWeight: 20
-			    },
-			if parameter.functionalGate != _|_ {
-				{
-					pause: duration: parameter.functionalGate.pause
-				},
-			},
-			if parameter.functionalGate != _|_ {
-				{
-					analysis: {
-						templates: [
-							{
-								templateName: "functional-gate-\(context.name)"
+			strategy: canary: 
+			{ 
+				canaryService: previewService
+				steps: [
+					{
+						setWeight: 20
+					},
+					if parameter.functionalGate != _|_ {
+					{
+						pause: duration: parameter.functionalGate.pause
+					},
+					},
+					if parameter.functionalGate != _|_ {
+					{
+						analysis: {
+							templates: [
+								{
+									templateName: "functional-gate-\(context.name)"
+								}
+							],
+							args: [
+								{
+									name: "service-name",
+									value: previewService
+								}
+							]
+						}
+					},
+					},
+					{
+						setWeight: 60
+					},
+					{
+						pause: duration: "15s"
+					},
+					{
+						setWeight: 80
+					}, 			
+					if parameter.performanceGate != _|_ {
+						{
+							pause: {
+								duration: parameter.performanceGate.pause
 							}
-						],
-						args: [
-							{
-								name: "service-name",
-								value: previewService
+						}
+					},
+					if parameter.performanceGate != _|_ {
+						{
+							analysis: {
+								templates: [
+									{
+										templateName: "performance-gate-\(context.name)"
+									}
+								],
+								args: [
+									{
+										name: "service-name",
+										value: previewService
+									}
+								]
 							}
-						]
+						}
 					}
-            	},
-			},
-			{
-				setWeight: 60
-			},
-			{
-				pause: duration: "15s"
-			},
-			{
-				setWeight: 80
-			}, 			
-			if parameter.performanceGate != _|_ {
-				{
-					pause: {
-                        duration: parameter.performanceGate.pause
-                    }
-				}
-			},
-			if parameter.performanceGate != _|_ {
-				{
-					analysis: {
-						templates: [
-							{
-								templateName: "performance-gate-\(context.name)"
-							}
-						],
-						args: [
-							{
-								name: "service-name",
-								value: previewService
-							}
-						]
-					}
-            	}
+				]
 			}
-            ]
 			template: {
 				metadata: labels: app: context.name
 				spec: containers: [{
@@ -143,7 +147,7 @@ template: {
 														"name": "test",
 														"image": parameter.functionalGate.image,
 														"args": [
-															previewService,
+															"\(previewService):\(parameter.port)",
 															"\(parameter.functionalGate.extraArgs)"
 															
 														]
@@ -182,7 +186,7 @@ template: {
 														"name": "test",
 														"image": parameter.performanceGate.image,
 														"args": [
-															previewService,
+															"\(previewService):\(parameter.port)",
 															"\(parameter.performanceGate.extraArgs)"
 															
 														]
