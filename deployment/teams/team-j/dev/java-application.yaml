@@ -17,6 +17,7 @@ spec:
         # performanceGate:
         #   pause: "10s"
         #   image: "public.ecr.aws/i8e1q7x5/javaperftest:latest"
+        #   extraArgs: "160"
       traits: 
         - type: path-based-ingress
           properties:
