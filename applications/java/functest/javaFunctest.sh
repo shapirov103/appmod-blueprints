@@ -5,6 +5,7 @@ echo "The expected color is defined by the input parameter. Failure: if the colo
 
 echo "The number of arguments is: $#"
 a=$#
+echo "Arguments are $1 and $2"
 
 clusterIP=$1
 failedColor=$2

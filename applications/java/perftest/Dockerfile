@@ -8,4 +8,4 @@ COPY javaPerftest.sh /
 RUN chmod +x /javaPerftest.sh
 # Set the entrypoint to the script with CMD arguments
 ENTRYPOINT ["/javaPerftest.sh"]
-CMD ["hulk"]
+CMD ["ingressurl", "expectedtimeout" ]

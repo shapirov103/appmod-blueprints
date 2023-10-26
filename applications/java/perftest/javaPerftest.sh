@@ -1,7 +1,6 @@
 #!/bin/bash
 echo "This script is performing the Performance test for Java application"
 
-echo "Based on the input parameter, color marked will be deemded as functionality failure"
 echo "Please enter the Java application ingress url and the expected average request time"
 echo "The number of arguments is: $#"
 a=$#

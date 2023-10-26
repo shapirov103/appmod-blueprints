@@ -2,7 +2,7 @@
 
 ## This part has following components
 
-1. javaFunctest.sh - Shell script which is accpeting two input parameters i.e Ingress hostname and the Color which should fail functional test
+1. javaFunctest.sh - Shell script which is accepting two input parameters i.e Ingress hostname and the Color which should fail functional test
 
 2. Dockerfile - Creating the custom image for testing
 
@@ -26,7 +26,7 @@ Pass on the two parameters which will be processed by image
 Following is the output
 
 ```
-This script is performing the Funnctional test for Java application
+This script is performing the functional test for Java application
 Based on the input parameter, color marked will be deemded as functionality failure
 The number of arguments is: 2
 Functional test failed: Mentioned Colour Found
