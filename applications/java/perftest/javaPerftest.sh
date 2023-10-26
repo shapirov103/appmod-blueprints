@@ -11,7 +11,7 @@ echo "Atleast two parameters are expected"
 exit 1
 
 fi
-
+echo "Arguments are $1 and $2"
 INGRESS_URL=$1
 REQUESTED_TIMEOUT=`echo $2`
 
@@ -27,7 +27,7 @@ echo "Total Time per Request is: $TotalTimeRequest ms"
 DECIMAL=`echo $TotalTimeRequest`
 INTEGER=${DECIMAL%.*}
 echo "Integer is $INTEGER"
-echo "RTO uis $INT_REQUEST_TO"
+echo "RTO is $INT_REQUEST_TO"
 if [ "$INTEGER" -le "$INT_REQUEST_TO" ]; then
 	echo "Performance test PASSED, average request time is: $TotalTimeRequest ms"
 	exit 0
