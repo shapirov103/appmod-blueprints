@@ -24,4 +24,4 @@ spec:
             domain: "*.amazonaws.com"
             rewritePath: "/java-app" 
             http:
-              /java-app1: 8080
+              /java-app: 8080
