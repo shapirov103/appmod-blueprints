@@ -40,7 +40,7 @@ phases:
       - echo "Current path is"
       - pwd
       - cd ../../../deployment/teams/team-j/dev
-      - myvar=`grep image java-application.yaml | awk -F':' '{print $3}'`
+      - myvar=`grep image java-application.yaml |head -1| awk -F':' '{print $3}'`
       - sed -i "s/$myvar/$IMAGE_TAG/g" java-application.yaml
       - cd ../../../..
       - git config --global user.email "codebuild@email.com"
