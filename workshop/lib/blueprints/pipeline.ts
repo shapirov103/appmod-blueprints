@@ -3,7 +3,30 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { StackProps } from 'aws-cdk-lib';
 import { VpcLookupByNameProvider } from './vpcprovider';
 
+const ARGO_INGRESS  = {
+    values: {
+        server: {
+            ingress: {
+                enabled: true,
+                ingressClassName: "nginx",
+                annotations: {
+                    "nginx.org/mergeable-ingress-type": "minion",
+                },
+                hosts: ["*.amazonaws.com"],
+                paths: ["/"],
+                https: false
+            }
+        },
+        configs: {
+            params: {
+                "server.insecure": true
+            }
+        }
+    }
+};
+
 const GIT_URL = "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/appmod-workshop";
+
 
 export default class PipelineStack {
     static build(scope: Construct, props: StackProps) {
