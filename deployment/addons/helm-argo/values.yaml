@@ -1,3 +1,12 @@
-configs:
-  params:
-    server.insecure: true
+server: 
+  ingress: 
+    enabled: true,
+    ingressClassName: "nginx"
+    annotations: 
+      "nginx.org/mergeable-ingress-type": "minion"
+    hosts: ["*.amazonaws.com"]
+    paths: ["/"]
+    https: false
+configs: 
+  params: 
+    "server.insecure": true
