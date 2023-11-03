@@ -17,5 +17,5 @@ spec:
             name: java-appmod-service
             port:
               number: 8080
-        path: /
+        path: /java-app
         pathType: ImplementationSpecific
