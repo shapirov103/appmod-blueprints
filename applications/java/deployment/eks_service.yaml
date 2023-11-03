@@ -4,7 +4,7 @@ metadata:
   name: java-appmod-service
   namespace: appmod-java 
 spec:
-  type: LoadBalancer #Use ClusterIP (the default) so that the service is only accessible within the cluster.
+  type: ClusterIP
   selector:
     app: java-appmod
     release: initial
