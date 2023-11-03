@@ -8,3 +8,6 @@ spec:
   ingressClassName: nginx
   rules:
   - host: '*.amazonaws.com'
+configs: 
+  params:
+    - server.insecure: true
