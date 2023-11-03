@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.org/mergeable-ingress-type: minion
+    nginx.org/rewrites: serviceName=java-appmod-service rewrite=/
+  name: java-appmod-service-ingress
+  namespace: appmod-java
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: '*.amazonaws.com'
+    http:
+      paths:
+      - backend:
+          service:
+            name: java-appmod-service
+            port:
+              number: 8080
+        path: /java-app
+        pathType: ImplementationSpecific
