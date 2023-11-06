@@ -1,15 +1,16 @@
 import { Construct } from 'constructs';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { VpcLookupByNameProvider } from './vpcprovider';
+import { StackProps } from 'aws-cdk-lib';
 
 const GIT_URL = "git@github.com:shapirov103/appmod-blueprints.git";
 
 export default class HybridCluster {
-    static build(scope: Construct) {
+    static build(scope: Construct, props: StackProps) {
         blueprints.EksBlueprint.builder()
             .version("auto")
             .resourceProvider(blueprints.GlobalResources.Vpc, new VpcLookupByNameProvider("appmod-vpc"))
-            .region("us-west-2")
+            .region(props.env!.region)
             .addOns(
                 new blueprints.AwsLoadBalancerControllerAddOn,
                 new blueprints.VpcCniAddOn, 

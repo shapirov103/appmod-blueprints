@@ -25,7 +25,7 @@ const ARGO_INGRESS  = {
     }
 };
 
-const GIT_URL = "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/appmod-workshop";
+const GIT_URL = `https://git-codecommit.${process.env.CDK_DEFAULT_REGION}.amazonaws.com/v1/repos/appmod-workshop`;
 
 
 export default class PipelineStack {
@@ -76,5 +76,6 @@ export default class PipelineStack {
                 }
             })
             .build(scope, "pipeline", props);
+            console.log(GIT_URL);
     }
 }
