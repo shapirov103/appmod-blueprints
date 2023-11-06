@@ -54,6 +54,12 @@ template: {
 					},
 					},
 					{
+						setWeight: 40
+					},
+					{
+						pause: duration: "15s"
+					},
+					{
 						setWeight: 60
 					},
 					{
