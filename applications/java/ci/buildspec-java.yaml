@@ -25,7 +25,7 @@ phases:
       - rm -rf gradle-8.4-bin.zip
       - git clone codecommit://appmod-workshop
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo Build started on `date`
@@ -33,8 +33,8 @@ phases:
       - gradle clean build
       - cp build/libs/*.war .
       - docker build -t$JAVA_IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
+      - docker tag $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
       - echo Build completed on `date`
       - echo "Updating the application version"
       - echo "Current path is"
