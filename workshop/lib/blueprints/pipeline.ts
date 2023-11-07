@@ -20,6 +20,9 @@ const ARGO_INGRESS  = {
         configs: {
             params: {
                 "server.insecure": true
+            },
+            cm: {
+                "timeout.reconciliation": "20s"
             }
         }
     }
