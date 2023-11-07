@@ -10,3 +10,4 @@ server:
 configs: 
   params: 
     "server.insecure": true
+  timeout.reconciliation: "20s"
