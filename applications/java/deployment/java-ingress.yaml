@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     nginx.org/mergeable-ingress-type: minion
-    nginx.org/rewrites: serviceName=java-appmod-service rewrite=/
+    nginx.org/rewrites: serviceName=java-appmod-service rewrite=/java-app/
   name: java-appmod-service-ingress
   namespace: appmod-java
 spec:
