@@ -1,6 +1,5 @@
 version: 0.2
 
-
 env:
     variables:
       IMAGE_TAG : "1.2"
@@ -32,19 +31,20 @@ phases:
       - cd appmod-workshop/applications/java/src
       - gradle clean build
       - cp build/libs/*.war .
+      - image_uri=" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/appmod-java-ecr:$IMAGE_TAG"
       - docker build -t$JAVA_IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/appmod-java-ecr:$IMAGE_TAG
+      - docker tag $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG $image_uri
+      - docker push $image_uri
       - echo Build completed on `date`
       - echo "Updating the application version"
       - echo "Current path is"
       - pwd
       - cd ../../../deployment/teams/team-j/dev
-      - myvar=`grep image java-application.yaml |head -1| awk -F':' '{print $3}'`
-      - sed -i "s/$myvar/$IMAGE_TAG/g" java-application.yaml
+      - current_image=`grep image java-application.yaml |head -1| awk -F':' '{print $2 ":" $3}'`
+      - sed -i "s,$current_image,$image_uri,g" java-application.yaml
       - cd ../../../..
       - git config --global user.email "codebuild@email.com"
       - git config --global user.name "CodeBuild user"
       - git add -A
-      - git commit -m "Changed DEV Version $myvar"
+      - git commit -m "Changed DEV Version to $image_uri"
       - git push
