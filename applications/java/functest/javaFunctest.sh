@@ -13,7 +13,7 @@ failedColor=$2
 curl -s "http://${clusterIP}/java-app/" > /tmp/curlout
  if grep -q -i "$failedColor" /tmp/curlout
 then
-    echo "Functional test SUCCESSFULL: Expected Color $2 Found"  
+    echo "Functional test SUCCESS: Expected Color $2 Found"  
    
     exit 0 
 else
