@@ -1,4 +1,4 @@
-FROM openjdk:11.0.7-jdk
+FROM public.ecr.aws/docker/library/openjdk:11.0.16-jdk
 RUN apt-get update && apt-get install -y unzip && apt-get install -y tomcat9 tomcat9-admin libtomcat9-embed-java libtomcat9-java  
 COPY *.war /.
 RUN mkdir /usr/share/tomcat9/webapps

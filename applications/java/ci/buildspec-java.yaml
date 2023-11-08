@@ -3,7 +3,7 @@ version: 0.2
 
 env:
     variables:
-      IMAGE_TAG : "v1alpha1"
+      IMAGE_TAG : "1.2"
       AWS_DEFAULT_REGION: "us-west-2"
       JAVA_IMAGE_REPO_NAME: "appmod-java-ecr"
       
