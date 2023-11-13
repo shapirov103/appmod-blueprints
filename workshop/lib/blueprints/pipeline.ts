@@ -74,9 +74,9 @@ export default class PipelineStack {
             .stage({
                 id: 'prod-stage',
                 stackBuilder: prodBlueprint.clone(),
-                stageProps: {
-                    pre: [new blueprints.pipelines.cdkpipelines.ManualApprovalStep('manual-approval')]
-                }
+                //
+                // Stage Approvals, Gates, transition conditions go here. 
+                //
             })
             .build(scope, "pipeline", props);
             console.log(GIT_URL);
