@@ -9,7 +9,7 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.11
+      java: corretto17
       
   pre_build:
     commands:
@@ -20,7 +20,6 @@ phases:
       - wget -cq https://services.gradle.org/distributions/gradle-8.4-bin.zip
       - unzip -q -d /opt/gradle gradle-8.4-bin.zip
       - export PATH=$PATH:/opt/gradle/gradle-8.4/bin
-      - yum -y -q install docker java-1.8.0
       - rm -rf gradle-8.4-bin.zip
       - git clone codecommit://appmod-workshop
       - echo Logging in to Amazon ECR...
