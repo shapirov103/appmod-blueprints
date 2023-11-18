@@ -31,7 +31,7 @@ phases:
       - gradle clean build
       - cp build/libs/*.war .
       - image_uri=" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/appmod-java-ecr:$IMAGE_TAG"
-      - docker build -t$JAVA_IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker build -t $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG .
       - docker tag $JAVA_IMAGE_REPO_NAME:$IMAGE_TAG $image_uri
       - docker push $image_uri
       - echo Build completed on `date`
