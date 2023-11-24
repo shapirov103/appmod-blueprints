@@ -141,3 +141,6 @@ workshop/package-lock.json
 workshop/cdk.out
 # Code commit code bundle tmp files
 .tmp
+
+# Gradle build files
+.gradle/
