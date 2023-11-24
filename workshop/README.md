@@ -1,6 +1,6 @@
 # How to use Infra
 
-## Prereqs:
+## Prereqs (local use):
 
 ```bash
 brew install node
@@ -11,7 +11,7 @@ cd platform/infra
 npm i 
 ```
 
-If your target account/region has not been bootstrapped to allow CDK deplyment, run the following command (only once for each account/region):
+If your target account/region has not been bootstrapped to allow CDK deployment, run the following command (only once for each account/region):
 
 ```bash
 cdk bootstrap cdk bootstrap aws://<your-account-number>/<region-to-bootstrap>
