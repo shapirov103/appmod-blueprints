@@ -1,0 +1,465 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudformation template for Cloud9 for AppMod Blueprints Workshop reInvent 2023
+Parameters:
+  C9InstanceType:
+    Description: Cloud9 instance type
+    Type: String
+    Default: m5.large
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - m5.large
+    ConstraintDescription: Must be a valid Cloud9 instance type
+  C9InstanceVolumeSize: 
+    Type: Number
+    Description: The Size in GB of the Cloud9 Instance Volume. 
+    Default: 60
+  C9Name:
+    Type: String
+    Description: Name of the C9 Environment.
+    Default: "appmod-blueprints-workshop"
+  StopTimeMinutes:
+    Type: Number
+    Description: The number of minutes the C9 instance waits to shut down after inactivity (in minutes)
+    Default: 2880
+  # CdkVersion:
+  #   Type: String
+  #   Description: CDK Version for the environment
+  #   Default: "2.93.0"
+  WorkshopStudioRun: 
+    Type: String
+    Description: Flag to determine if the workshop is run in Workshop Studio or not.
+    Default: "false"
+    AllowedValues: 
+      - "true"
+      - "false"
+
+Conditions: 
+  RunonWorkshopStudio: !Equals [ !Ref WorkshopStudioRun, "true" ]
+
+Resources:
+################## PERMISSIONS AND ROLES #################
+  C9Role:
+    Type: AWS::IAM::Role
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: AppMod-Blueprints-Workshop
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+            - ssm.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AdministratorAccess
+      Path: "/"
+      RoleName: !Join 
+        - "-" 
+        - - "appmod-blueprints-workshop-admin"
+          - !Select 
+            - 0
+            - !Split
+              - "-"
+              - !Select 
+                - 2
+                - !Split
+                  - "/"
+                  - !Ref "AWS::StackId"
+
+  C9LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName:
+          Fn::Join:
+          - ''
+          - - C9LambdaPolicy-
+            - Ref: AWS::Region
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+          - Effect: Allow
+            Action:
+            - cloudformation:DescribeStacks
+            - cloudformation:DescribeStackEvents
+            - cloudformation:DescribeStackResource
+            - cloudformation:DescribeStackResources
+            - ec2:DescribeInstances
+            - ec2:AssociateIamInstanceProfile
+            - ec2:ModifyInstanceAttribute
+            - ec2:ReplaceIamInstanceProfileAssociation
+            - iam:ListInstanceProfiles
+            - iam:PassRole
+            Resource: "*"
+
+################## LAMBDA BOOTSTRAP FUNCTION ################
+
+  C9BootstrapInstanceLambda:
+    Type: Custom::C9BootstrapInstanceLambda
+    Description: Bootstrap Cloud9 instance
+    DependsOn: C9LambdaExecutionRole
+    Properties:
+      Description: Bootstrap Cloud9 instance
+      Tags:
+        - Key: Environment
+          Value: AppMod-Blueprints-Workshop
+      ServiceToken:
+        Fn::GetAtt:
+        - C9BootstrapInstanceLambdaFunction
+        - Arn
+      REGION:
+        Ref: AWS::Region
+      EnvName: 
+        Fn::GetAtt:
+        - C9Instance
+        - Name
+      EnvironmentId:
+        Ref: C9Instance
+      LabIdeInstanceProfileName:
+        Ref: C9InstanceProfile
+      LabIdeInstanceProfileArn:
+        Fn::GetAtt:
+        - C9InstanceProfile
+        - Arn
+
+  C9BootstrapInstanceLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: AppMod-Blueprints-Workshop
+      Handler: index.lambda_handler
+      Role:
+        Fn::GetAtt:
+        - C9LambdaExecutionRole
+        - Arn
+      Runtime: python3.9
+      MemorySize: 256
+      Timeout: '600'
+      Code:
+        ZipFile: |
+          from __future__ import print_function
+          import boto3
+          import json
+          import os
+          import time
+          import traceback
+          import cfnresponse
+          
+          def lambda_handler(event, context):
+              # print('event: {}'.format(event))
+              # print('context: {}'.format(context))
+              responseData = {}
+
+              status = cfnresponse.SUCCESS
+          
+              if event['RequestType'] == 'Delete':
+                  responseData = {'Success': 'Custom Resource removed'}
+                  cfnresponse.send(event, context, status, responseData, 'CustomResourcePhysicalID')              
+          
+              if event['RequestType'] == 'Create':
+                  try:
+                      # Open AWS clients
+                      ec2 = boto3.client('ec2')
+          
+                      # Get the InstanceId of the Cloud9 IDE
+                      instance = ec2.describe_instances(Filters=[{'Name': 'tag:Name','Values': ['aws-cloud9-'+event['ResourceProperties']['EnvName']+'-'+event['ResourceProperties']['EnvironmentId']]}])['Reservations'][0]['Instances'][0]
+                      print('instance: {}'.format(instance))
+                      # logger.info('instance: {}'.format(instance))
+          
+                      # Create the IamInstanceProfile request object
+                      iam_instance_profile = {
+                          'Arn': event['ResourceProperties']['LabIdeInstanceProfileArn'],
+                          'Name': event['ResourceProperties']['LabIdeInstanceProfileName']
+                      }
+                      # logger.info('iam_instance_profile: {}'.format(iam_instance_profile))
+          
+                      # Wait for Instance to become ready before adding Role
+                      instance_state = instance['State']['Name']
+                      # logger.info('instance_state: {}'.format(instance_state))
+                      while instance_state != 'running':
+                          time.sleep(5)
+                          instance_state = ec2.describe_instances(InstanceIds=[instance['InstanceId']])
+                          # logger.info('instance_state: {}'.format(instance_state))
+          
+                      # attach instance profile
+                      response = ec2.associate_iam_instance_profile(IamInstanceProfile=iam_instance_profile, InstanceId=instance['InstanceId'])
+                      # logger.info('response - associate_iam_instance_profile: {}'.format(response))
+                      r_ec2 = boto3.resource('ec2')
+  
+                      responseData = {'Success': 'Started bootstrapping for instance: '+instance['InstanceId']}
+                      cfnresponse.send(event, context, status, responseData, 'CustomResourcePhysicalID')
+                      
+                  except Exception as e:
+                      status = cfnresponse.FAILED
+                      print(traceback.format_exc())
+                      responseData = {'Error': traceback.format_exc(e)}
+                  finally:
+                      cfnresponse.send(event, context, status, responseData, 'CustomResourcePhysicalID')
+
+################## SSM BOOTSRAP HANDLER ###############
+
+  C9OutputBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+
+  C9SSMDocument: 
+    Type: AWS::SSM::Document
+    Properties: 
+      Tags:
+        - Key: Environment
+          Value: AppMod-Blueprints-Workshop
+      DocumentType: Command
+      DocumentFormat: YAML
+      Content: 
+        schemaVersion: '2.2'
+        description: Bootstrap Cloud9 Instance
+        mainSteps:
+        - action: aws:runShellScript
+          name: C9bootstrap
+          inputs:
+            runCommand:
+            - "#!/bin/bash"
+            - date
+            - echo LANG=en_US.utf-8 >> /etc/environment
+            - echo LC_ALL=en_US.UTF-8 >> /etc/environment
+            - . /home/ubuntu/.bashrc
+            - apt-get -y install jq gettext bash-completion moreutils libunwind
+            - echo '=== CONFIGURE default python version ==='
+            - PATH=$PATH:/usr/bin
+            - alternatives --set python /usr/bin/python3.9
+            - echo '=== INSTALL and CONFIGURE default software components ==='
+            - sudo -H -u ubuntu bash -c "pip install --user -U boto boto3 botocore awscli aws-sam-cli"
+            - echo '=== Resizing the Instance volume ==='
+            - !Sub SIZE=${C9InstanceVolumeSize}
+            - !Sub REGION=${AWS::Region}
+            - |
+              SIZE=${1:-60}
+              TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+              INSTANCEID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id 2> /dev/null) 
+              
+              VOLUMEID=$(aws ec2 describe-instances \
+                --instance-id $INSTANCEID \
+                --query "Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId" \
+                --output text --region $REGION)
+              aws ec2 modify-volume --volume-id $VOLUMEID --size $SIZE --region $REGION
+              while [ \
+                "$(aws ec2 describe-volumes-modifications \
+                  --volume-id $VOLUMEID \
+                  --filters Name=modification-state,Values="optimizing","completed" \
+                  --query "length(VolumesModifications)"\
+                  --output text --region $REGION)" != "1" ]; do
+              sleep 1
+              done
+              if [[ -e "/dev/xvda" && $(readlink -f /dev/xvda) = "/dev/xvda" ]]
+              then
+                sudo growpart /dev/xvda 1
+                STR=$(cat /etc/os-release)
+                SUB="VERSION_ID=\"2\""
+                if [[ "$STR" == *"$SUB"* ]]
+                then
+                  sudo xfs_growfs -d /
+                else
+                  sudo resize2fs /dev/xvda1
+                fi
+              else
+                sudo growpart /dev/nvme0n1 1
+                STR=$(cat /etc/os-release)
+                SUB="VERSION_ID=\"2\""
+                if [[ "$STR" == *"$SUB"* ]]
+                then
+                  sudo xfs_growfs -d /
+                else
+                  sudo resize2fs /dev/nvme0n1p1
+                fi
+              fi
+            - echo '=== REINSTALL appropriate CDK version (2.93.0) ==='
+            - !Sub sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && rm ~/.nvm/versions/node/*/bin/cdk && npm install -g aws-cdk@2.99.1 && npm install -g c9"
+            - echo '=== Clear Managed Temporary Credentials ==='
+            - rm -vf ${HOME}/.aws/credentials
+            - !Sub echo 'export ACCOUNT_ID=${AWS::AccountId}' | tee -a /home/ubuntu/.bash_profile
+            - !Sub echo 'export AWS_REGION=${AWS::Region}' | tee -a /home/ubuntu/.bash_profile
+            - !Sub echo 'aws configure set default.region ${AWS::Region}' >> /home/ubuntu/.bash_profile
+            - aws sts get-caller-identity --query Arn | grep appmod-blueprints-workshop-admin -q && echo "IAM role valid" || echo "IAM role NOT valid"
+            - echo '=== BOOTSTRAP CDK with the right regions ==='
+            - !Sub REGION=${AWS::Region}
+            - !Sub ACCOUNT_ID=${AWS::AccountId}
+            - |
+              sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cdk bootstrap --trust=$ACCOUNT_ID \
+                --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess \
+                aws://$ACCOUNT_ID/$REGION"
+            - echo '=== CONFIGURE kubectl and setting ENVIRONMENT VARIABLES ==='
+            - curl -o kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.4/2023-08-16/bin/linux/amd64/kubectl
+            - chmod +x ./kubectl
+            - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+            - echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+            - kubectl completion bash >>  /home/ubuntu/.bash_completion
+            - . /etc/profile.d/bash_completion.sh
+            - . /home/ubuntu/.bash_completion
+            - echo "Install Helm"
+            - curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+            - echo "Install Gradle and Open JDK"
+            - sudo mkdir -p /opt/gradle
+            - sudo wget -cq https://services.gradle.org/distributions/gradle-8.4-bin.zip
+            - sudo unzip -q -o gradle-8.4-bin.zip -d /opt/gradle
+            - sudo export PATH=$PATH:/opt/gradle/gradle-8.4/bin
+            - echo "export PATH=\$PATH:/opt/gradle/gradle-8.4/bin" >> /home/ubuntu/.bashrc
+            - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash 
+            - source ~/.bashrc && nvm install 20.0.0 && nvm alias default 20.0.0
+            - echo "Installing ArgoCD CLI"
+            - sudo wget https://github.com/argoproj/argo-cd/releases/download/v2.4.14/argocd-linux-amd64
+            - sudo chmod +x argocd-linux-amd64
+            - sudo mv argocd-linux-amd64 /usr/local/bin/argocd
+            - !Sub echo 'export JSII_SILENCE_WARNING_DEPRECATED_NODE_VERSION=1' | tee -a /home/ubuntu/.bash_profile
+            - echo '=== Bootstrap Hybrid cluster ==='
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment && git clone --depth 1 https://github.com/shapirov103/appmod-blueprints.git"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/platform/infra && npm i"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/platform/infra && npm run vpc deploy"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/platform/infra && npm run code-commit-repo deploy"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/workshop && npm i"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/workshop && cdk deploy hybrid-cluster --require-approval never"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/workshop && cdk deploy pipeline --require-approval never"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/workshop && cdk deploy pipeline/dev-stage/dev-stage-blueprint --require-approval never"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/appmod-blueprints/workshop && cdk deploy pipeline/prod-stage/prod-stage-blueprint --require-approval never"
+            - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/ && git clone codecommit://appmod-workshop"
+            - sudo -s rm -rf /home/ubuntu/environment/appmod-blueprints"
+
+            #- export HYBRID_KUBE_CONFIG=$(aws cloudformation describe-stacks --stack-name hybrid-cluster | jq -r '.Stacks[0].Outputs[] | select(.OutputKey|match("ConfigCommand"))| .OutputValue')
+            #- !Sub echo "export HYBRID_KUBE_CONFIG=$HYBRID_KUBE_CONFIG" | tee -a /home/ubuntu/.bash_profile
+            #- !Sub HYBRID_KUBE_CONFIG=$HYBRID_KUBE_CONFIG
+            #- echo 'Hybrid kube config = '$HYBRID_KUBE_CONFIG
+            #- echo '=== Bootstrap Dev and Prod Vanilla clusters ==='
+            #- export CLUSTER_VPC_ID=$(aws ec2 describe-vpcs --filters Name=cidr,Values=10.10.0.0/16 --query 'Vpcs[0].VpcId' | tr -d '"')
+            #- !Sub echo "export CLUSTER_VPC_ID=$CLUSTER_VPC_ID" | tee -a /home/ubuntu/.bash_profile
+            #- !Sub CLUSTER_VPC_ID=$CLUSTER_VPC_ID
+            #- echo 'cluster VPC ID is '$CLUSTER_VPC_ID
+            #- sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/test-bp/dev-cluster && npm i"
+            #- sudo -H -u ubuntu bash -c ". ~/.bash_profile && cd /home/ubuntu/environment/test-bp/dev-cluster && cdk deploy dev-cluster --require-approval never"
+            #- sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/test-bp/prod-cluster && npm i"
+            #- sudo -H -u ubuntu bash -c ". ~/.bash_profile && cd /home/ubuntu/environment/test-bp/prod-cluster && cdk deploy prod-cluster --require-approval never"
+            # - sudo -H -u ubuntu bash -c ". ~/.nvm/nvm.sh && cd /home/ubuntu/environment/test-bp/dev-cluster && cdk deploy dev-cluster --require-approval never"
+            
+  
+  C9BootstrapAssociation: 
+    Type: AWS::SSM::Association
+    Properties: 
+      Name: !Ref C9SSMDocument
+      OutputLocation: 
+        S3Location:
+          OutputS3BucketName: !Ref C9OutputBucket
+          OutputS3KeyPrefix: bootstrapoutput
+      Targets:
+        - Key: tag:SSMBootstrap
+          Values:
+          - Active
+
+################## INSTANCE #####################
+
+  C9InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      InstanceProfileName: !Join 
+        - "-" 
+        - - "appmod-blueprints-workshop-admin"
+          - !Select 
+            - 0
+            - !Split
+              - "-"
+              - !Select 
+                - 2
+                - !Split
+                  - "/"
+                  - !Ref "AWS::StackId"
+      Roles:
+      - Ref: C9Role
+
+
+  C9Instance:
+    DependsOn: C9BootstrapAssociation
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties:
+      Description: AWS Cloud9 instance for AppMod Blueprints Workshop
+      AutomaticStopTimeMinutes: !Ref StopTimeMinutes
+      ImageId: ubuntu-22.04-x86_64
+      InstanceType:
+        Ref: C9InstanceType
+      Name: 
+        Ref: C9Name
+      OwnerArn: !If [RunonWorkshopStudio, !Sub "arn:aws:iam::${AWS::AccountId}:assumed-role/WSParticipantRole/Participant", !Ref "AWS::NoValue" ]
+      Tags: 
+        - 
+          Key: SSMBootstrap
+          Value: Active
+        - 
+          Key: Environment
+          Value: AppMod-Blueprints-Workshop
+        - 
+          Key: Instance
+          Value: Cloud9
+          
+  CodeCommitUser:
+    Type: "AWS::IAM::User"
+    Properties:
+      UserName: "code-commit-user"
+      Policies:
+        - PolicyName: "AWSCodeCommitPowerUserPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "codecommit:BatchGetRepositories"
+                  - "codecommit:CreateBranch"
+                  - "codecommit:CreatePullRequest"
+                  - "codecommit:DeleteBranch"
+                  - "codecommit:Get*"
+                  - "codecommit:GitPull"
+                  - "codecommit:GitPush"
+                  - "codecommit:List*"
+                  - "codecommit:MergePullRequestByFastForward"
+                  - "codecommit:TestRepositoryTriggers"
+                  - "codecommit:UpdatePullRequestDescription"
+                  - "codecommit:UpdatePullRequestStatus"
+                  - "codecommit:UpdatePullRequestTitle"
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                Resource: "*"
+
+Outputs: 
+  Cloud9IDE:
+    Value:
+      Fn::Join:
+      - ''
+      - - https://
+        - Ref: AWS::Region
+        - ".console.aws.amazon.com/cloud9/ide/"
+        - Ref: C9Instance
+        - "?region="
+        - Ref: AWS::Region
+  C9RoleArn:
+    Description: Cloud9 Role ARN
+    Value: !GetAtt C9Role.Arn
